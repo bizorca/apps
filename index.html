@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bizorca Apps — Small Business Web Apps Built Fast</title>
+  <meta name="description" content="A portfolio of small web apps built for small businesses. Custom tools, SaaS platforms, and niche apps — built lean, deployed fast.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50:  '#f0f4ff',
+              100: '#e0eaff',
+              200: '#c3d4fe',
+              500: '#4f6ef7',
+              600: '#3b55e6',
+              700: '#2d42cc',
+              900: '#1a2566',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* TidyCal embed override */
+    #tidycal-embed { min-height: 600px; }
+  </style>
+</head>
+<body class="bg-white text-slate-800 font-sans antialiased">
+
+  <!-- Nav -->
+  <header class="border-b border-slate-100 sticky top-0 bg-white/95 backdrop-blur z-10">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="/" class="font-bold text-lg tracking-tight text-slate-900">
+        <span class="text-brand-600">Bizorca</span> Apps
+      </a>
+      <a href="#book" class="text-sm font-medium bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition-colors">
+        Book a Call
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="max-w-5xl mx-auto px-6 pt-20 pb-16">
+    <div class="max-w-3xl">
+      <p class="text-brand-600 font-semibold text-sm uppercase tracking-widest mb-4">Built in Public</p>
+      <h1 class="text-4xl sm:text-5xl font-bold text-slate-900 leading-tight mb-6">
+        Small business apps.<br>Built fast. Priced honestly.
+      </h1>
+      <p class="text-xl text-slate-600 leading-relaxed mb-8">
+        I'm Jassen Bowman. I run <a href="https://bizorca.com" class="text-brand-600 hover:underline">Bizorca</a> — a one-person shop that builds focused web apps for small businesses. Not sprawling enterprise systems. Not bloated agency projects. Just the right tool, built clean, that solves one problem really well.
+      </p>
+      <div class="flex flex-wrap gap-4">
+        <a href="#projects" class="inline-block bg-brand-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-brand-700 transition-colors">
+          See the Apps
+        </a>
+        <a href="#book" class="inline-block border border-slate-300 text-slate-700 font-semibold px-6 py-3 rounded-lg hover:border-brand-500 hover:text-brand-600 transition-colors">
+          Book a Consultation
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why I'm doing this -->
+  <section class="bg-slate-50 border-y border-slate-100">
+    <div class="max-w-5xl mx-auto px-6 py-16">
+      <div class="max-w-3xl">
+        <h2 class="text-2xl font-bold text-slate-900 mb-6">Why I'm building all of this</h2>
+        <div class="prose prose-slate max-w-none text-slate-700 leading-relaxed space-y-4">
+          <p>
+            I've spent years doing tax and accounting work — advising small business owners, watching them struggle with cobbled-together spreadsheets and off-the-shelf software that almost fits their workflow but never quite does. The gap between "there's probably an app for this" and "there's actually a good app for exactly this" is enormous. I decided to start closing that gap one project at a time.
+          </p>
+          <p>
+            I'm doing this with Claude Code, Anthropic's AI coding tool. I'm not a classically trained software engineer. I'm a tax accountant who learned to code — which, it turns out, is a pretty useful combination when you're building business tools. I understand the problem domain. I understand the user. And now I can ship working software in days instead of months.
+          </p>
+          <p>
+            Every app on this page is something I built because a real problem needed solving. Some are SaaS platforms. Some are games. Some are tools I use myself. All of them were built lean, without a team, without a seed round, and without a year-long roadmap. Just a clear problem, a working solution, and a deploy script.
+          </p>
+          <!-- PERSONAL NARRATIVE: Add your own paragraph here about the specific moment or client interaction that pushed you to start building. What was the straw that broke the camel's back? -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section id="projects" class="max-w-5xl mx-auto px-6 py-20">
+    <h2 class="text-2xl font-bold text-slate-900 mb-3">The apps</h2>
+    <p class="text-slate-600 mb-10">These are live, working apps — not mockups, not landing pages for vaporware.</p>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- Career Keel -->
+      <a href="https://careerkeel.com" target="_blank" rel="noopener" class="group block border border-slate-200 rounded-xl p-6 hover:border-brand-400 hover:shadow-md transition-all">
+        <div class="flex items-start justify-between mb-3">
+          <span class="text-2xl">🧭</span>
+          <span class="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full">Live</span>
+        </div>
+        <h3 class="font-bold text-slate-900 group-hover:text-brand-600 transition-colors mb-2">Career Keel</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">72-question career assessment that surfaces your top job matches out of 923 careers. AI-powered personalized career reports, DISC profile, strengths analysis. One-time payment — no subscription required.</p>
+        <p class="text-xs text-slate-400 mt-3">careerkeel.com</p>
+      </a>
+
+      <!-- Heartfelt Finance -->
+      <a href="https://heartfeltfinance.com" target="_blank" rel="noopener" class="group block border border-slate-200 rounded-xl p-6 hover:border-brand-400 hover:shadow-md transition-all">
+        <div class="flex items-start justify-between mb-3">
+          <span class="text-2xl">💰</span>
+          <span class="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full">Live</span>
+        </div>
+        <h3 class="font-bold text-slate-900 group-hover:text-brand-600 transition-colors mb-2">Heartfelt Finance</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">Kakeibo-inspired mindful budgeting. Instead of treating spending like a data entry problem, it treats it like a values problem. Financial coaching, reflection prompts, and intentional money tracking.</p>
+        <p class="text-xs text-slate-400 mt-3">heartfeltfinance.com</p>
+      </a>
+
+      <!-- Chinese Astrology -->
+      <a href="https://astrology.bizorca.com" target="_blank" rel="noopener" class="group block border border-slate-200 rounded-xl p-6 hover:border-brand-400 hover:shadow-md transition-all">
+        <div class="flex items-start justify-between mb-3">
+          <span class="text-2xl">☯️</span>
+          <span class="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full">Live</span>
+        </div>
+        <h3 class="font-bold text-slate-900 group-hover:text-brand-600 transition-colors mb-2">Ba Zi Astrology</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">Traditional Chinese astrology based on TCM principles. Full Ba Zi (Four Pillars) chart, AI-generated personal readings, monthly forecasts, element-matched meditations, and compatibility checker.</p>
+        <p class="text-xs text-slate-400 mt-3">astrology.bizorca.com</p>
+      </a>
+
+      <!-- Provisions -->
+      <a href="https://myprovisions.co" target="_blank" rel="noopener" class="group block border border-slate-200 rounded-xl p-6 hover:border-brand-400 hover:shadow-md transition-all">
+        <div class="flex items-start justify-between mb-3">
+          <span class="text-2xl">🍽️</span>
+          <span class="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full">Live</span>
+        </div>
+        <h3 class="font-bold text-slate-900 group-hover:text-brand-600 transition-colors mb-2">Provisions</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">Operations platform for private chefs and catering businesses. Client management, recipe library, menu building, cook day scheduling, and invoicing — with each business on its own subdomain.</p>
+        <p class="text-xs text-slate-400 mt-3">myprovisions.co</p>
+      </a>
+
+      <!-- ToolTrust -->
+      <a href="https://tooltrust.org" target="_blank" rel="noopener" class="group block border border-slate-200 rounded-xl p-6 hover:border-brand-400 hover:shadow-md transition-all">
+        <div class="flex items-start justify-between mb-3">
+          <span class="text-2xl">🔧</span>
+          <span class="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full">Live</span>
+        </div>
+        <h3 class="font-bold text-slate-900 group-hover:text-brand-600 transition-colors mb-2">ToolTrust</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">SaaS platform for community tool libraries. Each library gets its own subdomain with inventory management, member checkouts, and billing. Built for cooperatives, makerspaces, and neighborhood lending programs.</p>
+        <p class="text-xs text-slate-400 mt-3">tooltrust.org</p>
+      </a>
+
+      <!-- Foop -->
+      <a href="https://foop.health" target="_blank" rel="noopener" class="group block border border-slate-200 rounded-xl p-6 hover:border-brand-400 hover:shadow-md transition-all">
+        <div class="flex items-start justify-between mb-3">
+          <span class="text-2xl">🥗</span>
+          <span class="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full">Live</span>
+        </div>
+        <h3 class="font-bold text-slate-900 group-hover:text-brand-600 transition-colors mb-2">Foop</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">Health tracking app for logging food and mood, with a correlation engine that finds patterns in your data. Includes a healthcare provider view so practitioners can monitor client progress directly.</p>
+        <p class="text-xs text-slate-400 mt-3">foop.health</p>
+      </a>
+
+      <!-- CPE HQ -->
+      <a href="https://cpehq.com" target="_blank" rel="noopener" class="group block border border-slate-200 rounded-xl p-6 hover:border-brand-400 hover:shadow-md transition-all">
+        <div class="flex items-start justify-between mb-3">
+          <span class="text-2xl">📜</span>
+          <span class="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full">Live</span>
+        </div>
+        <h3 class="font-bold text-slate-900 group-hover:text-brand-600 transition-colors mb-2">CPE HQ</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">Continuing education platform for tax professionals. IRS and NASBA approved. EAs, CPAs, and attorneys take self-study video courses or verify live webinar attendance, then get official CPE certificates.</p>
+        <p class="text-xs text-slate-400 mt-3">cpehq.com</p>
+      </a>
+
+      <!-- TaxCRM -->
+      <a href="https://taxcrm.net" target="_blank" rel="noopener" class="group block border border-slate-200 rounded-xl p-6 hover:border-brand-400 hover:shadow-md transition-all">
+        <div class="flex items-start justify-between mb-3">
+          <span class="text-2xl">📋</span>
+          <span class="text-xs font-medium text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full">Live</span>
+        </div>
+        <h3 class="font-bold text-slate-900 group-hover:text-brand-600 transition-colors mb-2">TaxCRM</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">Multi-tenant CRM built specifically for tax resolution firms. Client intake, case tracking, document management, and follow-up workflows — designed for the actual workflow of a tax resolution practice.</p>
+        <p class="text-xs text-slate-400 mt-3">taxcrm.net</p>
+      </a>
+
+      <!-- Burn Rate -->
+      <a href="https://burnrate.bizorca.com" target="_blank" rel="noopener" class="group block border border-slate-200 rounded-xl p-6 hover:border-brand-400 hover:shadow-md transition-all">
+        <div class="flex items-start justify-between mb-3">
+          <span class="text-2xl">💸</span>
+          <span class="text-xs font-medium text-violet-700 bg-violet-50 px-2 py-1 rounded-full">Game</span>
+        </div>
+        <h3 class="font-bold text-slate-900 group-hover:text-brand-600 transition-colors mb-2">Burn Rate</h3>
+        <p class="text-sm text-slate-600 leading-relaxed">A game where you inherit $1 billion and have to spend it all. Harder than it sounds. Probably the most fun I've had shipping anything in years.</p>
+        <p class="text-xs text-slate-400 mt-3">burnrate.bizorca.com</p>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- What I can do for you -->
+  <section class="bg-slate-900 text-white">
+    <div class="max-w-5xl mx-auto px-6 py-20">
+      <div class="max-w-3xl">
+        <h2 class="text-2xl font-bold mb-6">What I can build for your business</h2>
+        <p class="text-slate-300 text-lg leading-relaxed mb-8">
+          If you've got a business process that's running on spreadsheets, sticky notes, or a generic tool that almost works — I can probably build you something better for less than you'd spend on two months of a SaaS subscription you don't fully use.
+        </p>
+
+        <div class="grid sm:grid-cols-2 gap-6 mb-10">
+          <div class="bg-slate-800 rounded-xl p-6">
+            <h3 class="font-semibold text-white mb-2">Client &amp; CRM portals</h3>
+            <p class="text-slate-400 text-sm leading-relaxed">Custom client-facing portals, intake forms, case tracking, document sharing, and follow-up workflows built for your specific business.</p>
+          </div>
+          <div class="bg-slate-800 rounded-xl p-6">
+            <h3 class="font-semibold text-white mb-2">Niche SaaS platforms</h3>
+            <p class="text-slate-400 text-sm leading-relaxed">Multi-tenant platforms for niche industries. If you're serving a market that's underserved by existing software, we can build the tool that market actually needs.</p>
+          </div>
+          <div class="bg-slate-800 rounded-xl p-6">
+            <h3 class="font-semibold text-white mb-2">Operational tools</h3>
+            <p class="text-slate-400 text-sm leading-relaxed">Scheduling engines, inventory systems, reporting dashboards, invoicing workflows — the internal tools that make operations run without constant manual intervention.</p>
+          </div>
+          <div class="bg-slate-800 rounded-xl p-6">
+            <h3 class="font-semibold text-white mb-2">AI-powered features</h3>
+            <p class="text-slate-400 text-sm leading-relaxed">Integrations with Claude and other AI models to generate reports, analyze data, draft documents, or handle any task where a language model adds real value.</p>
+          </div>
+        </div>
+
+        <div class="border-l-4 border-brand-500 pl-6">
+          <p class="text-slate-300 italic leading-relaxed">
+            "I'm not an agency. I don't have a project manager, a design team, or a five-figure minimum engagement. I'm one person who builds things fast, understands small business operations, and has shipped a lot of working software. If that sounds like what you need, let's talk."
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Book a consultation -->
+  <section id="book" class="max-w-5xl mx-auto px-6 py-20">
+    <div class="max-w-3xl mx-auto text-center mb-10">
+      <h2 class="text-2xl font-bold text-slate-900 mb-4">Book a free consultation</h2>
+      <p class="text-slate-600 leading-relaxed">
+        Tell me what you're trying to build or what problem you're trying to solve. We'll spend 30 minutes figuring out whether a custom app is the right answer — and what that would actually look like.
+      </p>
+    </div>
+
+    <!-- TidyCal embed — replace YOUR_TIDYCAL_PATH with your actual path, e.g. jassen/consultation -->
+    <div id="tidycal-embed" data-path="YOUR_TIDYCAL_PATH"></div>
+    <script src="https://asset-tidycal.b-cdn.net/js/embed.js" async></script>
+
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-100 bg-slate-50">
+    <div class="max-w-5xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+      <div>
+        <span class="font-semibold text-slate-700">Bizorca LLC</span> &mdash; Washington State
+      </div>
+      <div class="flex gap-6">
+        <a href="https://bizorca.com" class="hover:text-brand-600 transition-colors">bizorca.com</a>
+        <a href="mailto:jassen@bizorca.com" class="hover:text-brand-600 transition-colors">jassen@bizorca.com</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
