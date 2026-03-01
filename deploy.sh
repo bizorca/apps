@@ -16,6 +16,7 @@ echo ""
 echo "Uploading files..."
 rsync -avz --delete -e "ssh ${SSH_OPTS}" \
   --exclude='.git' \
+  --exclude='.gitignore' \
   --exclude='deploy.sh' \
   --exclude='CLAUDE.md' \
   --exclude='*.md' \
