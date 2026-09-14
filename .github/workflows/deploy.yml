@@ -41,12 +41,7 @@ jobs:
         run: |
           # `domain list` returns a top-level JSON array of domain objects.
           ssh -i ~/.ssh/deploy_key -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" '
-            id=$(site-tools-client -j domain list | python3 -c "
-import sys, json
-for d in json.load(sys.stdin):
-    if d.get(\"name\") == \"apps.bizorca.com\":
-        print(d[\"id\"]); break
-")
+            id=$(site-tools-client -j domain list | python3 -c "import sys,json; print(next(d[\"id\"] for d in json.load(sys.stdin) if d.get(\"name\")==\"apps.bizorca.com\"))")
             test -n "$id"
             site-tools-client -j domain update id="$id" flush_cache=1
           '
