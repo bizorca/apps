@@ -1,0 +1,56 @@
+name: Deploy to apps.bizorca.com
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  SSH_HOST: gcam1203.siteground.biz
+  SSH_USER: u2361-smkk6swqmgxj
+  SSH_PORT: "18765"
+  REMOTE_PUBLIC: /home/customer/www/apps.bizorca.com/public_html
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Deploy via rsync
+        run: |
+          rsync -avz --delete \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.gitignore' \
+            --exclude='deploy.sh' \
+            --exclude='*.md' \
+            --exclude='*.txt' \
+            --exclude='.DS_Store' \
+            -e "ssh -i ~/.ssh/deploy_key -p $SSH_PORT" \
+            ./ "$SSH_USER@$SSH_HOST:$REMOTE_PUBLIC/"
+
+      - name: Flush SiteGround dynamic cache
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" '
+            id=$(site-tools-client -j domain list \
+              | python3 -c "import sys,json;d=json.load(sys.stdin);print(next(v[\"id\"] for v in (d[\"data\"] if isinstance(d,dict) and \"data\" in d else d).values() if v.get(\"name\")==\"apps.bizorca.com\"))" 2>/dev/null)
+            if [ -n "$id" ]; then
+              site-tools-client -j domain update id="$id" flush_cache=1
+            else
+              echo "Could not resolve domain id for apps.bizorca.com; flush skipped."
+            fi
+          '
+
+      - name: Verify
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" "https://apps.bizorca.com/?cb=${GITHUB_SHA}")
+          echo "apps.bizorca.com returned $code"
+          test "$code" = "200"
