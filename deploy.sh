@@ -28,6 +28,7 @@ APP="applications/qukjzcxeas"
 # Tools ported into this repo, each a folder at the repo root with a public/.
 TOOLS=(
   proforma
+  kit
 )
 
 # Directories in the server web root that belong to something else and must

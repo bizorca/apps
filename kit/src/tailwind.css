@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Numeric columns line up only if the figures are tabular. Worksheets are
+     full of money and hours read down a column, so this is not cosmetic. */
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  /* Worksheet number inputs. Right-aligned and tabular for the same reason. */
+  input[type="text"].amount, input[type="number"].amount {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  .field {
+    @apply w-full rounded-md border border-hairline bg-surface px-3 py-2 text-ink
+           placeholder:text-muted/60 focus:border-primary focus:outline-none
+           focus:ring-2 focus:ring-primary/20;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2
+           font-medium transition-colors focus:outline-none focus:ring-2
+           focus:ring-primary/30 disabled:opacity-50;
+  }
+  .btn-primary   { @apply btn bg-primary text-primary-ink hover:opacity-90; }
+  .btn-secondary { @apply btn border border-hairline bg-surface text-ink hover:bg-sunk; }
+  .btn-quiet     { @apply btn text-muted hover:text-ink hover:bg-sunk; }
+  .btn-danger    { @apply btn border border-bad/30 bg-bad-soft text-bad hover:bg-bad hover:text-white; }
+
+  .card  { @apply rounded-lg border border-hairline bg-surface; }
+  .label { @apply block text-sm font-medium text-ink; }
+  .hint  { @apply mt-1 text-sm text-muted; }
+
+  /* The four-layer tags. Same colours everywhere they appear. */
+  .tag { @apply inline-flex items-center rounded px-1.5 py-0.5 text-xs font-semibold; }
+}
+
+/* Print: the assessment packet is handed to a client on paper often enough
+   that this is a real surface, not an afterthought. */
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff !important; }
+  .card { border-color: #bbb !important; break-inside: avoid; }
+  a[href]::after { content: ""; }
+  .print-break { break-before: page; }
+}
