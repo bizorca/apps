@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bizorca Apps — Small Business Web Apps Built Fast</title>
-  <meta name="description" content="A portfolio of small web apps built for small businesses. Custom tools, SaaS platforms, and niche apps — built lean, deployed fast.">
+  <title>Bizorca Tools — For Business Owners and Coaches</title>
+  <meta name="description" content="Working software for business owners and coaches: financial models, client portals, CRMs and planning tools. Need one that doesn't exist yet? Request it.">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -36,32 +36,95 @@
   <header class="border-b border-slate-100 sticky top-0 bg-white/95 backdrop-blur z-10">
     <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
       <a href="/" class="font-bold text-lg tracking-tight text-slate-900">
-        <span class="text-brand-600">Bizorca</span> Apps
+        <span class="text-brand-600">Bizorca</span> Tools
       </a>
-      <a href="#book" class="text-sm font-medium bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition-colors">
-        Book a Call
-      </a>
+      <div class="flex items-center gap-5">
+        <a href="#book" class="hidden sm:inline text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Book a Call</a>
+        <a href="#request" class="text-sm font-medium bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition-colors">
+          Request a Tool
+        </a>
+      </div>
     </div>
   </header>
 
-  <!-- Hero -->
-  <section class="max-w-5xl mx-auto px-6 pt-20 pb-16">
-    <div class="max-w-3xl">
-      <p class="text-brand-600 font-semibold text-sm uppercase tracking-widest mb-4">Built in Public</p>
-      <h1 class="text-4xl sm:text-5xl font-bold text-slate-900 leading-tight mb-6">
-        Small business apps.<br>Built fast. Priced honestly.
-      </h1>
-      <p class="text-xl text-slate-600 leading-relaxed mb-8">
-        I'm Jassen Bowman. I run <a href="https://bizorca.com" class="text-brand-600 hover:underline">Bizorca</a> — a one-person shop that builds focused web apps for small businesses. Not sprawling enterprise systems. Not bloated agency projects. Just the right tool, built clean, that solves one problem really well.
-      </p>
-      <div class="flex flex-wrap gap-4">
-        <a href="#projects" class="inline-block bg-brand-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-brand-700 transition-colors">
-          See the Apps
-        </a>
-        <a href="#book" class="inline-block border border-slate-300 text-slate-700 font-semibold px-6 py-3 rounded-lg hover:border-brand-500 hover:text-brand-600 transition-colors">
-          Book a Consultation
-        </a>
+  <!-- Hero + request form -->
+  <section class="max-w-5xl mx-auto px-6 pt-16 pb-16">
+    <div class="grid lg:grid-cols-5 gap-12 items-start">
+
+      <div class="lg:col-span-3 lg:pt-6">
+        <p class="text-brand-600 font-semibold text-sm uppercase tracking-widest mb-4">For business owners and coaches</p>
+        <h1 class="text-4xl sm:text-5xl font-bold text-slate-900 leading-tight mb-6">
+          Tools for business owners and coaches.
+        </h1>
+        <p class="text-xl text-slate-600 leading-relaxed mb-6">
+          I'm Jassen Bowman. I spent years in tax and accounting watching good businesses run on spreadsheets, sticky notes, and software that <em>almost</em> fit. So I started building the tools that were missing &mdash; pro forma models for wellness studios, valuation reports, a client workspace for coaches, a CRM for practitioners who'd rather be with clients than doing data entry.
+        </p>
+        <p class="text-lg text-slate-600 leading-relaxed mb-8">
+          Everything below is live and working. If the tool you need isn't here yet, tell me what it should do. I read every request myself.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <a href="#projects" class="inline-block bg-brand-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-brand-700 transition-colors">
+            Browse the Tools
+          </a>
+          <a href="#request" class="inline-block border border-slate-300 text-slate-700 font-semibold px-6 py-3 rounded-lg hover:border-brand-500 hover:text-brand-600 transition-colors">
+            Request a Tool
+          </a>
+        </div>
       </div>
+
+      <!-- Request a tool -->
+      <div id="request" class="lg:col-span-2 scroll-mt-24 bg-slate-50 border border-slate-200 rounded-2xl p-6 sm:p-8">
+        <h2 class="text-xl font-bold text-slate-900 mb-2">Request a tool</h2>
+        <p class="text-sm text-slate-600 leading-relaxed mb-6">
+          What are you still doing by hand? Describe the job and how you handle it today. The requests that keep coming up go to the top of the build list.
+        </p>
+
+        <div id="request-notice" class="hidden text-sm rounded-lg px-4 py-3 mb-5" role="status"></div>
+
+        <form id="request-form" action="/request.php" method="post" class="space-y-4">
+          <div>
+            <label for="rq-name" class="block text-sm font-medium text-slate-700 mb-1">Name</label>
+            <input id="rq-name" name="name" type="text" required maxlength="100" autocomplete="name"
+              class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200">
+          </div>
+          <div>
+            <label for="rq-email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+            <input id="rq-email" name="email" type="email" required maxlength="200" autocomplete="email"
+              class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200">
+          </div>
+          <div>
+            <label for="rq-role" class="block text-sm font-medium text-slate-700 mb-1">I'm a&hellip;</label>
+            <select id="rq-role" name="role" required
+              class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200">
+              <option value="">Choose one</option>
+              <option value="owner">Business owner</option>
+              <option value="coach">Coach or advisor</option>
+              <option value="other">Something else</option>
+            </select>
+          </div>
+          <div>
+            <label for="rq-need" class="block text-sm font-medium text-slate-700 mb-1">What should the tool do?</label>
+            <textarea id="rq-need" name="need" rows="4" required maxlength="4000"
+              placeholder="e.g. Track which clients are due for a check-in and draft the reminder for me."
+              class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"></textarea>
+          </div>
+          <div>
+            <label for="rq-now" class="block text-sm font-medium text-slate-700 mb-1">How do you handle it now? <span class="font-normal text-slate-400">(optional)</span></label>
+            <input id="rq-now" name="now" type="text" maxlength="500" placeholder="Spreadsheet, paper, an app that almost works&hellip;"
+              class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200">
+          </div>
+          <!-- Honeypot: hidden from people, irresistible to bots. -->
+          <div class="hidden" aria-hidden="true">
+            <label for="rq-website">Website</label>
+            <input id="rq-website" name="website" type="text" tabindex="-1" autocomplete="off">
+          </div>
+          <input type="hidden" name="t" id="rq-t" value="">
+          <button type="submit" class="w-full bg-brand-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-brand-700 transition-colors">
+            Send Request
+          </button>
+        </form>
+      </div>
+
     </div>
   </section>
 
@@ -78,7 +141,7 @@
             I'm doing this with Claude Code, Anthropic's AI coding tool. I'm not a classically trained software engineer. I'm a tax accountant who learned to code — which, it turns out, is a pretty useful combination when you're building business tools. I understand the problem domain. I understand the user. And now I can ship working software in days instead of months.
           </p>
           <p>
-            Every app on this page is something I built because a real problem needed solving. Some are SaaS platforms. Some are games. Some are tools I use myself. All of them were built lean, without a team, without a seed round, and without a year-long roadmap. Just a clear problem, a working solution, and a deploy script.
+            Every tool on this page is something I built because a real problem needed solving. Some are SaaS platforms. Some are games. Some are tools I use myself. All of them were built lean, without a team, without a seed round, and without a year-long roadmap. Just a clear problem, a working solution, and a deploy script.
           </p>
           <!-- PERSONAL NARRATIVE: Add your own paragraph here about the specific moment or client interaction that pushed you to start building. What was the straw that broke the camel's back? -->
         </div>
@@ -88,8 +151,8 @@
 
   <!-- Projects -->
   <section id="projects" class="max-w-5xl mx-auto px-6 py-20">
-    <h2 class="text-2xl font-bold text-slate-900 mb-3">The apps</h2>
-    <p class="text-slate-600 mb-10">These are live, working apps — not mockups, not landing pages for vaporware.</p>
+    <h2 class="text-2xl font-bold text-slate-900 mb-3">The tools</h2>
+    <p class="text-slate-600 mb-10">These are live, working tools — not mockups, not landing pages for vaporware.</p>
 
     <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
@@ -382,6 +445,31 @@
       </div>
     </div>
   </footer>
+
+  <script>
+    // Stamp when the form was shown (a bot that posts instantly gets dropped),
+    // and turn request.php's ?request=… redirect into a visible notice.
+    (function () {
+      var t = document.getElementById('rq-t');
+      if (t) t.value = String(Math.floor(Date.now() / 1000));
+
+      var state = new URLSearchParams(location.search).get('request');
+      var messages = {
+        sent:    ['Got it. Thanks for the request; I\'ll reply by email if I have questions.', 'bg-emerald-50 text-emerald-800 border border-emerald-200'],
+        invalid: ['Please fill in your name, a valid email, who you are, and what the tool should do.', 'bg-amber-50 text-amber-800 border border-amber-200'],
+        limited: ['That\'s a lot of requests in a short time. Try again in an hour, or email jassen@bizorca.com.', 'bg-amber-50 text-amber-800 border border-amber-200'],
+        error:   ['Something went wrong on my end. Please email jassen@bizorca.com instead.', 'bg-red-50 text-red-800 border border-red-200']
+      };
+      var m = state && messages[state];
+      if (!m) return;
+      var box = document.getElementById('request-notice');
+      box.textContent = m[0];
+      box.className = 'text-sm rounded-lg px-4 py-3 mb-5 ' + m[1];
+      if (state === 'sent') document.getElementById('request-form').reset();
+      history.replaceState(null, '', location.pathname + '#request');
+      document.getElementById('request').scrollIntoView();
+    })();
+  </script>
 
 </body>
 </html>
