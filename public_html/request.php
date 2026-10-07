@@ -7,19 +7,17 @@
  * what a token would prove for a logged-out form anyway. Bots are filtered by
  * a honeypot field, a minimum time on page, and a per-IP hourly cap.
  *
- * Every accepted request is appended to private_html/tool-requests.jsonl
+ * Every accepted request is appended to private_html/data/tool-requests.jsonl
  * BEFORE mail is attempted, so a missing or broken SMTP2GO key never loses
- * one. The key lives in private_html/.env.php, which returns an array:
- *
- *   <?php return ['SMTP2GO_API_KEY' => 'api-...'];
- *
- * private_html is a sibling of public_html on Cloudways, outside the web root.
+ * one. Mail goes through the shared tl_mail(), keyed from private_html/.env.php.
  */
 
 declare(strict_types=1);
 
+require dirname(__DIR__) . '/private_html/includes/bootstrap.php';
+require_once TL_PRIVATE . '/includes/mailer.php';
+
 const REQUEST_TO     = 'jassen@bizorca.com';
-const REQUEST_FROM   = 'Bizorca Tools <tools@bizorca.com>';
 const MIN_SECONDS    = 3;
 const MAX_PER_HOUR   = 5;
 
@@ -31,23 +29,11 @@ function back(string $state): never
 
 function private_dir(): string
 {
-    $dir = dirname(__DIR__) . '/private_html';
+    $dir = TL_PRIVATE . '/data';
     if (!is_dir($dir)) {
-        // Local dev: the repo root is the web root, so keep scratch data in tmp.
-        $dir = sys_get_temp_dir() . '/bizorca-tools';
         @mkdir($dir, 0775, true);
     }
     return $dir;
-}
-
-function env(string $key): string
-{
-    static $env = null;
-    if ($env === null) {
-        $file = private_dir() . '/.env.php';
-        $env  = is_file($file) ? (array) require $file : [];
-    }
-    return (string) ($env[$key] ?? '');
 }
 
 function clean(string $field, int $max): string
@@ -131,31 +117,12 @@ $text = "New tool request from tools.bizorca.com\n\n"
       . "What the tool should do:\n{$need}\n\n"
       . "How they handle it now:\n" . ($now !== '' ? $now : '(not given)') . "\n";
 
-$sent = false;
-$key  = env('SMTP2GO_API_KEY');
-if ($key !== '') {
-    $ch = curl_init('https://api.smtp2go.com/v3/email/send');
-    curl_setopt_array($ch, [
-        CURLOPT_POST           => true,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT        => 10,
-        CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
-        CURLOPT_POSTFIELDS     => json_encode([
-            'api_key'        => $key,
-            'to'             => [REQUEST_TO],
-            'sender'         => REQUEST_FROM,
-            'subject'        => 'Tool request: ' . mb_substr(preg_replace('/\s+/', ' ', $need), 0, 60),
-            'text_body'      => $text,
-            'custom_headers' => [['header' => 'Reply-To', 'value' => str_replace(["\r", "\n"], '', $email)]],
-        ]),
-    ]);
-    $body = curl_exec($ch);
-    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    // Parse the response; SMTP2GO's JSON has no space after the colon.
-    $json = is_string($body) ? json_decode($body, true) : null;
-    $sent = $code === 200 && is_array($json) && (int) ($json['data']['succeeded'] ?? 0) > 0;
-}
+$sent = tl_mail(
+    REQUEST_TO,
+    'Tool request: ' . mb_substr((string) preg_replace('/\s+/', ' ', $need), 0, 60),
+    $text,
+    $email
+);
 
 // Saved but not mailed is still a success for the visitor; it's in the log.
 back($saved !== false || $sent ? 'sent' : 'error');

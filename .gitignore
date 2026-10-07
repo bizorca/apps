@@ -1,6 +1,4 @@
 .DS_Store
-.env
-.env.php
-
-# Local business notes — never deploy or commit
-*.txt
+# Server-only secrets and runtime data. private_html/ is otherwise code.
+private_html/.env.php
+private_html/data/
