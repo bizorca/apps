@@ -48,6 +48,12 @@ rsync -rltzO --delete ${DRY[@]+"${DRY[@]}"} -v \
     --exclude='*.txt' \
     "$BUILD/" "${SSH_HOST}:${APP_DIR}/"
 
+# Cloudways' Varnish caches the static page at the origin (x-cache: HIT), so a
+# deploy is invisible until it expires. A PURGE from the server itself clears it.
+if [[ ${#DRY[@]} -eq 0 ]]; then
+    ssh "$SSH_HOST" 'curl -s -o /dev/null -X PURGE -H "Host: tools.bizorca.com" http://127.0.0.1/'
+fi
+
 echo ""
 echo "Deployed. Check the origin directly (works before and after the DNS cutover):"
 echo "  curl -sk --resolve tools.bizorca.com:443:143.198.64.127 https://tools.bizorca.com/"
