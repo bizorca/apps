@@ -5,14 +5,14 @@ Static HTML landing page for apps.bizorca.com. Portfolio of Bizorca small busine
 
 ## Tech Stack
 - **Single file**: `index.html` — Tailwind CSS via CDN, no build step
-- **Hosting**: SiteGround (same server as astrology.bizorca.com)
+- **Hosting**: Cloudways (143.198.64.127), app folder `venfcqcwjp`
 - **Repo**: github.com/bizorca/apps
 
 ## Deployment
-- **URL**: apps.bizorca.com
-- **Deploy**: `./deploy.sh` (rsync to SiteGround via SSH)
-- **SSH**: `-p 18765 -i ~/.ssh/bizorca_key u2361-smkk6swqmgxj@gcam1203.siteground.biz`
-- **Remote web root**: `/home/customer/www/apps.bizorca.com/public_html/`
+- **URL**: tools.bizorca.com (moving from apps.bizorca.com)
+- **Deploy**: `./deploy.sh` (git archive HEAD + rsync; `--dry-run` to preview). GitHub Actions removed
+- **SSH**: `ssh cloudways-bizorca` (see Archipelago root CLAUDE.md)
+- **Remote web root**: `applications/venfcqcwjp/public_html` (relative to master home)
 
 ## TidyCal Embed
 In index.html, find `data-path="YOUR_TIDYCAL_PATH"` and replace with the actual TidyCal booking path (e.g., `jassen/consultation`).

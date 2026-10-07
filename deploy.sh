@@ -1,5 +1,5 @@
 #!/bin/bash
-# Deploy apps.bizorca.com to Cloudways.
+# Deploy tools.bizorca.com to Cloudways.
 #
 # Usage:
 #   ./deploy.sh            deploy the committed HEAD
@@ -38,7 +38,7 @@ echo "Deploying $(git log -1 --format='%h %s') to ${SSH_HOST}:${APP_DIR}"
 # -rltz, not -a: public_html is owned by the app user, so never try to set owner,
 # group or permissions on it. -O: skip directory times. nginx serves .md/.txt as
 # plain text here, so they stay excluded.
-rsync -rltzO --delete "${DRY[@]}" -v \
+rsync -rltzO --delete ${DRY[@]+"${DRY[@]}"} -v \
     --exclude='.git' \
     --exclude='.github' \
     --exclude='.gitignore' \
@@ -50,4 +50,4 @@ rsync -rltzO --delete "${DRY[@]}" -v \
 
 echo ""
 echo "Deployed. Check the origin directly (works before and after the DNS cutover):"
-echo "  curl -sk --resolve apps.bizorca.com:443:143.198.64.127 https://apps.bizorca.com/"
+echo "  curl -sk --resolve tools.bizorca.com:443:143.198.64.127 https://tools.bizorca.com/"
