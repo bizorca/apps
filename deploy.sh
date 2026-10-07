@@ -14,7 +14,7 @@ set -euo pipefail
 SSH_HOST="cloudways-bizorca"   # ~/.ssh/config alias: master user, ~/.ssh/cloudways_bizorca
 # Relative to the remote home on purpose: master's home is /home/master, and an
 # absolute path built from the username makes rsync deploy into a phantom tree.
-APP_DIR="applications/venfcqcwjp/public_html"
+APP_DIR="applications/qukjzcxeas/public_html"
 
 DRY=()
 [[ "${1:-}" == "--dry-run" ]] && DRY=(--dry-run)
