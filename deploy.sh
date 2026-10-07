@@ -1,33 +1,53 @@
 #!/bin/bash
-# Deploy Script for apps.bizorca.com (SiteGround)
+# Deploy apps.bizorca.com to Cloudways.
 #
-# Usage: ./deploy.sh
+# Usage:
+#   ./deploy.sh            deploy the committed HEAD
+#   ./deploy.sh --dry-run  show what would change, transfer nothing
 #
-# bizorca_siteground / bizorca_key / bizorca_placecard are all passphrase-encrypted
-# and ssh-agent is empty, so they fail or hang. dispatch_bizorca is plain text and
-# authenticates to the main account despite the project-specific name.
-SSH_KEY="${BIZORCA_SSH_KEY:-$HOME/.ssh/dispatch_bizorca}"
-SSH_OPTS="-p 18765 -i ${SSH_KEY}"
-SSH_HOST="u2361-smkk6swqmgxj@gcam1203.siteground.biz"
-REMOTE_PUBLIC="/home/customer/www/apps.bizorca.com/public_html"
+# Ships the committed tree only (git archive HEAD), so untracked notes in the
+# working copy never reach the web root. --delete also removes Cloudways' stock
+# index.php placeholder, which would otherwise be served ahead of index.html.
 
-set -e
+set -euo pipefail
 
-echo "Deploying to apps.bizorca.com"
-echo "  Web root: ${REMOTE_PUBLIC}"
+SSH_HOST="cloudways-bizorca"   # ~/.ssh/config alias: master user, ~/.ssh/cloudways_bizorca
+# Relative to the remote home on purpose: master's home is /home/master, and an
+# absolute path built from the username makes rsync deploy into a phantom tree.
+APP_DIR="applications/venfcqcwjp/public_html"
+
+DRY=()
+[[ "${1:-}" == "--dry-run" ]] && DRY=(--dry-run)
+
+cd "$(dirname "$0")"
+
+if ! git diff --quiet HEAD --; then
+    echo "Uncommitted changes to tracked files. This deploys HEAD only, so commit first." >&2
+    git status --short --untracked-files=no >&2
+    exit 1
+fi
+
+ssh "$SSH_HOST" "test -d ${APP_DIR}" || { echo "${APP_DIR} not found on server" >&2; exit 1; }
+
+BUILD=$(mktemp -d)
+trap 'rm -rf "$BUILD"' EXIT
+git archive HEAD | tar -x -C "$BUILD"
+
+echo "Deploying $(git log -1 --format='%h %s') to ${SSH_HOST}:${APP_DIR}"
+
+# -rltz, not -a: public_html is owned by the app user, so never try to set owner,
+# group or permissions on it. -O: skip directory times. nginx serves .md/.txt as
+# plain text here, so they stay excluded.
+rsync -rltzO --delete "${DRY[@]}" -v \
+    --exclude='.git' \
+    --exclude='.github' \
+    --exclude='.gitignore' \
+    --exclude='.DS_Store' \
+    --exclude='deploy.sh' \
+    --exclude='*.md' \
+    --exclude='*.txt' \
+    "$BUILD/" "${SSH_HOST}:${APP_DIR}/"
+
 echo ""
-
-echo "Uploading files..."
-rsync -avz --delete -e "ssh ${SSH_OPTS}" \
-  --exclude='.git' \
-  --exclude='.gitignore' \
-  --exclude='deploy.sh' \
-  --exclude='CLAUDE.md' \
-  --exclude='*.md' \
-  --exclude='*.txt' \
-  ./ "${SSH_HOST}:${REMOTE_PUBLIC}/"
-
-echo ""
-echo "Deployed!"
-echo "  Live at: https://apps.bizorca.com/"
-echo ""
+echo "Deployed. Check the origin directly (works before and after the DNS cutover):"
+echo "  curl -sk --resolve apps.bizorca.com:443:143.198.64.127 https://apps.bizorca.com/"
