@@ -1,0 +1,31 @@
+Nicole Odeh
+Web app idea
+Therapists, yoga instructors, yoga studios
+How to package services, how many clients/students do I need
+Pro forma forecasting tool
+Insurance reimbursement matrix, based on reimbursement rates
+Then determine what level of staff and other overhead they can support
+These rates are negotiable
+There are different reimbursement rates for different billing codes
+So the tool needs to incorporate this matrix billing codes, to balance out income
+It's ok if this tool gets 80% of there
+The big friction is what the business owner can afford to pay the sub-therapists per hour
+Can be both public facing and private use
+Takes into account the other business expenses
+How many appointments does each therapist employee have? This becomes a reporting and advising tool for accountants
+We have the reimbursement rate data for several local therapists in Connecticut
+Display a comparison of running only a cash pay practice
+Display an entry board where the user can enter the name of their insurance company that reimburses and what they pay out, and a cell to state what percentage of their clients are using that insurance company, also a line for cash pay
+Entry screen for their expenses
+
+
+----
+Yoga studio, personal trainer gyms, martial arts dojos: private, class passes, per class, subscription for unlimited
+What am I paying each yoga instructor per class
+Do you offer free introductory class?
+Are you doing online?
+But still need take into account overhead
+Do you need to cap yourself because of how many physical bodies you can have the in the room?
+Can be both public facing and private use
+Takes into account the other business expenses
+Entry screen for their expenses
