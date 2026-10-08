@@ -39,6 +39,7 @@ TOOLS=(
   burnrate
   astrology
   placecard
+  timebank
 )
 
 # Directories in the server web root that belong to something else and must

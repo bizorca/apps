@@ -1,0 +1,98 @@
+/*
+ * TimeBank — Custom CSS
+ * Tailwind handles almost everything. This file is for the few things
+ * that Tailwind's utility classes can't express cleanly.
+ */
+
+/* Star rating input (endorsements) */
+.star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 0.125rem;
+}
+
+.star-rating input[type="radio"] {
+    display: none;
+}
+
+.star-rating label {
+    cursor: pointer;
+    font-size: 1.75rem;
+    color: #d1d5db;
+    transition: color 0.1s ease;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+    color: #f59e0b;
+}
+
+/* Print styles — account statement */
+@media print {
+    nav, .no-print, button, .btn-print-hide {
+        display: none !important;
+    }
+    body {
+        background: white;
+        font-size: 12px;
+    }
+    .print-full {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th, td {
+        border: 1px solid #e5e7eb;
+        padding: 4px 8px;
+    }
+}
+
+/* Avatar placeholder */
+.avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0d9488, #0f766e);
+    color: white;
+    font-weight: 700;
+    font-size: 1.25rem;
+    border-radius: 9999px;
+}
+
+/* Balance chip — positive/negative */
+.balance-positive { color: #059669; font-weight: 600; }
+.balance-negative { color: #dc2626; font-weight: 600; }
+.balance-zero     { color: #6b7280; }
+
+/* Notification dot pulse */
+.notification-dot {
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.7; transform: scale(1.2); }
+}
+
+/* CSS-only bar chart (category breakdown report) */
+.bar-track {
+    background: #f3f4f6;
+    border-radius: 4px;
+    height: 1.25rem;
+    width: 100%;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #0d9488, #14b8a6);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* Alpine cloak — prevent flash of un-initialized content */
+[x-cloak] { display: none !important; }
