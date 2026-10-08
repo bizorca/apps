@@ -34,6 +34,7 @@ TOOLS=(
   lattice
   dispatch
   fathom
+  foundry
 )
 
 # Directories in the server web root that belong to something else and must
