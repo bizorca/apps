@@ -30,6 +30,8 @@ TOOLS=(
   proforma
   kit
   tinybooks
+  thinkrep
+  lattice
 )
 
 # Directories in the server web root that belong to something else and must
