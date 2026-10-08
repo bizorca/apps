@@ -34,15 +34,26 @@ CW_CNF='cd ~/'"$CW_PRIV"' && umask 077 && php -r '\''$e = require ".env.php"; pr
 
 sync_db() {
     echo "== database"
-    "${SG[@]}" "$SG_CNF"' && mysqldump --defaults-extra-file=$HOME/.af-sync.cnf --single-transaction \
+    # 1. Dump on SiteGround to a gzip file (single transaction, so consistent).
+    "${SG[@]}" "$SG_CNF"' && set -o pipefail && umask 077 && mysqldump --defaults-extra-file=$HOME/.af-sync.cnf --single-transaction \
             --no-create-info --skip-triggers --no-tablespaces --hex-blob --set-gtid-purged=OFF \
-            --ignore-table=$DB.users --ignore-table=$DB.schema_migrations $DB; rc=$?; rm -f ~/.af-sync.cnf; exit $rc' \
-    | "${CW[@]}" "$CW_CNF"' && {
+            --ignore-table=$DB.users --ignore-table=$DB.schema_migrations $DB | gzip -1 > ~/af-dump.sql.gz; rc=$?; rm -f ~/.af-sync.cnf; \
+            [ $rc -eq 0 ] && zcat ~/af-dump.sql.gz | tail -1 | grep -q "Dump completed" && md5sum ~/af-dump.sql.gz | cut -d" " -f1 > ~/af-dump.md5 && ls -la ~/af-dump.sql.gz | awk "{print \"   dumped \" \$5 \" bytes\"}"; exit $rc'
+    local want; want=$("${SG[@]}" 'cat ~/af-dump.md5')
+    # 2. Cloudways pulls it straight from SiteGround (resumable; the Mac relay stalls).
+    ssh-add -t 3600 "$HOME/.ssh/dispatch_bizorca" >/dev/null 2>&1
+    ssh -A -o ServerAliveInterval=30 cloudways-bizorca "cd ~/$CW_PRIV/data && umask 077 \
+        && rsync -tz --partial -e 'ssh -p 18765 -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30' \
+             u2361-smkk6swqmgxj@gcam1203.siteground.biz:af-dump.sql.gz ./af-dump.sql.gz \
+        && [ \"\$(md5sum af-dump.sql.gz | cut -d' ' -f1)\" = '$want' ] && echo '   pulled, MD5 matches'"
+    # 3. Import: truncate every af_ table, then load (table names get the af_ prefix).
+    "${CW[@]}" "$CW_CNF"' && F=data/af-dump.sql.gz && {
             echo "SET FOREIGN_KEY_CHECKS=0;"
             mysql --defaults-extra-file=$HOME/.af-sync.cnf -N $DB -e "SELECT CONCAT(\"TRUNCATE TABLE \`\", table_name, \"\`;\") FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name LIKE \"af\\_%\""
-            sed -E "s/^(INSERT INTO|LOCK TABLES|\/\*!40000 ALTER TABLE) \`([a-z_]+)\`/\1 \`af_\2\`/"
+            gunzip -c $F | sed -E "s/^(INSERT INTO|LOCK TABLES|\/\*!40000 ALTER TABLE) \`([a-z_]+)\`/\1 \`af_\2\`/"
             echo "SET FOREIGN_KEY_CHECKS=1;"
-        } | mysql --defaults-extra-file=$HOME/.af-sync.cnf $DB; rc=$?; rm -f ~/.af-sync.cnf; exit $rc'
+        } | mysql --defaults-extra-file=$HOME/.af-sync.cnf $DB; rc=$?; rm -f ~/.af-sync.cnf $F; exit $rc'
+    "${SG[@]}" 'rm -f ~/af-dump.sql.gz ~/af-dump.md5'
     echo "   imported"
 }
 
