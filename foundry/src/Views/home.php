@@ -425,7 +425,7 @@ ob_start();
 
         <div class="bg-slate-950 rounded-2xl p-10 text-center mb-10">
             <div class="text-slate-400 text-sm font-semibold uppercase tracking-widest mb-3">Weekly rate</div>
-            <div class="text-7xl font-black text-white mb-2">$1,500</div>
+            <div class="text-7xl font-black text-white mb-2">$3,500</div>
             <div class="text-slate-400 text-lg">per week</div>
         </div>
 
