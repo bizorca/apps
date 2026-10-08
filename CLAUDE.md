@@ -3,7 +3,7 @@
 ## Overview
 **Bizorca Tools**: tools for business owners and coaches, all on one domain with **one shared login and one MySQL database**. Each tool lives at `tools.bizorca.com/<tool>/`. The landing page (`public_html/index.html`) lists the tools, has a "Request a tool" form, and carries the services pitch and TidyCal booking.
 
-Formerly apps.bizorca.com (static portfolio on SiteGround); moved to Cloudways and renamed 2026-10-07. apps.bizorca.com should redirect here via a Cloudflare rule.
+Formerly apps.bizorca.com (static portfolio on SiteGround); moved to Cloudways and renamed 2026-10-07. apps.bizorca.com redirects here via a Cloudflare redirect rule (wildcard `https://apps.bizorca.com/*` → `https://tools.bizorca.com/`).
 
 ## Porting a tool in
 Each tool gets **its own folder at the repo root holding everything it needs** (`proforma/` is the reference). The original project directory is deleted once the port is verified, so nothing may be left behind in it. Read `proforma/CLAUDE.md` for the worked example; the recipe:
@@ -15,7 +15,7 @@ Each tool gets **its own folder at the repo root holding everything it needs** (
 5. Secrets move out of committed config into `private_html/.env.php` (`tl_env()`), and `private_html/.env.example.php` lists them.
 6. Add the tool to `TOOLS` in `deploy.sh`, link its card on the landing page.
 7. Write an import script if it has users/data (`proforma/bin/import-sqlite.php`), test locally against a copy of the live data, compare output against the original, then import on the server.
-8. Cut over: Cloudflare redirect `old.host/*` → `tools.bizorca.com/<tool>/*`.
+8. Cut over: the old subdomain is simply retired. No redirect is added (decided 2026-10-07: no SEO value and no real traffic). Tell the tool's few real users where it moved instead.
 
 ## Layout (repo mirrors the server)
 ```
