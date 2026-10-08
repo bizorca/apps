@@ -1,0 +1,18 @@
+/* Bizorca brand tokens — the single definition of the palette.
+   Read by the PHP app and inlined by the Python worker's renderers, so a change
+   here re-brands every asset on the next render. PNG and JPEG only, never WebP. */
+:root {
+  --navy:   #1B3A5C;
+  --navy-2: #142C47;
+  --gold:   #D4A017;
+  --ink:    #26303B;
+  --muted:  #58616D;
+  --grey:   #8A8F98;
+  --cream:  #F7F3E7;
+  --paper:  #F5F7FA;
+
+  --serif:  Georgia, 'Times New Roman', serif;
+  --sans:   Helvetica, Arial, sans-serif;
+  --rule:   linear-gradient(90deg, var(--gold) 0%, var(--navy) 70%);
+  --footer: 'bizorca.com  ·  © 2026 Bizorca LLC';
+}

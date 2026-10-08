@@ -43,4 +43,11 @@ return [
     'PD_ZOOM_CLIENT_ID'     => '',
     'PD_ZOOM_CLIENT_SECRET' => '',
     // Optional: PD_ORIGIN
+
+    // Anglerfish (admin-only publishing desk)
+    'AF_ANTHROPIC_API_KEY' => '',
+    'AF_ANTHROPIC_MODEL'   => '',
+    'AF_GEMINI_API_KEY'    => '',
+    'AF_WORKER_TOKEN'      => '',   // REQUIRED, must match writer/press/worker/.env
+    // Optional: AF_GEMINI_TEXT_MODEL, AF_GEMINI_IMAGE_MODEL, AF_DB_TIMEZONE, AF_ENV
 ];

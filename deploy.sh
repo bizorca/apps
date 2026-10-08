@@ -43,6 +43,7 @@ TOOLS=(
   commonweal
   numbrella
   pod
+  anglerfish
 )
 
 # Directories in the server web root that belong to something else and must
@@ -100,6 +101,9 @@ echo "Deploying $(git log -1 --format='%h %s') to ${SSH_HOST}:${APP}"
 # owner, group or permissions on them. -O: skip directory times. nginx serves
 # .md as plain text on this app, so docs never ship.
 RSYNC=(rsync -rltzO --delete ${DRY[@]+"${DRY[@]}"} --exclude='.DS_Store' --exclude='*.md')
+# Private tool code may need .md files read at runtime (Anglerfish's worker
+# prompts). rsync's first matching rule wins, so the include precedes *.md.
+RSYNC_PRIV=(rsync -rltzO --delete ${DRY[@]+"${DRY[@]}"} --exclude='.DS_Store' --include='/worker/prompts/*.md' --exclude='*.md')
 
 # ---------------------------------------------------------------- web root
 
@@ -122,7 +126,7 @@ for t in ${TOOLS[@]+"${TOOLS[@]}"}; do
     "${RSYNC[@]}" -i "$BUILD/$t/public/" "${SSH_HOST}:${APP}/public_html/$t/"
     # bin/ (CLI scripts) goes to private_html with the rest: anything in the
     # web root of an nginx-only Cloudways app is reachable over HTTP.
-    "${RSYNC[@]}" -i --exclude='/public/' --exclude='/data/' --exclude='/docs/' "$BUILD/$t/" "${SSH_HOST}:${APP}/private_html/$t/"
+    "${RSYNC_PRIV[@]}" -i --exclude='/public/' --exclude='/data/' --exclude='/docs/' "$BUILD/$t/" "${SSH_HOST}:${APP}/private_html/$t/"
 done
 
 if [[ ${#DRY[@]} -gt 0 ]]; then
