@@ -82,6 +82,18 @@ if [[ -n "$UNKNOWN" ]]; then
     exit 1
 fi
 
+# Same for private_html: a tool staged there before it joins TOOLS (code
+# uploaded by hand, say) would otherwise be wiped by the shared-core sync.
+KNOWN_PRIV=" ${TOOLS[*]:-} data $(cd "$BUILD/private_html" && find . -mindepth 1 -maxdepth 1 -type d | sed 's#^\./##' | tr '\n' ' ') "
+UNKNOWN=$(ssh "$SSH_HOST" "cd ${APP}/private_html && find . -mindepth 1 -maxdepth 1 -type d -printf '%f\\n'" \
+    | while read -r d; do [[ "$KNOWN_PRIV" == *" $d "* ]] || echo "$d"; done)
+if [[ -n "$UNKNOWN" ]]; then
+    echo "Refusing to deploy: these private_html directories are not a tool or in private_html/," >&2
+    echo "and --delete would remove them:" >&2
+    echo "$UNKNOWN" | sed 's/^/  /' >&2
+    exit 1
+fi
+
 echo "Deploying $(git log -1 --format='%h %s') to ${SSH_HOST}:${APP}"
 
 # -rltz, not -a: the app folders are owned by the app user, so never try to set
