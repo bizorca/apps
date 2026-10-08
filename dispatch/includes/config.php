@@ -40,7 +40,7 @@ define('DP_ORIGIN', (string) tl_env('DP_ORIGIN', 'https://tools.bizorca.com'));
 // Email: Dispatch sends HTML (the digest), so it keeps its own SMTP2GO sender
 // rather than tl_mail(), using the shared account's key.
 define('DP_MAIL_KEY', (string) tl_env('SMTP2GO_API_KEY', ''));
-const DP_MAIL_FROM_ADDRESS = 'jassen@bizorca.com';
+const DP_MAIL_FROM_ADDRESS = 'noreply@bizorca.com';
 const DP_MAIL_FROM_NAME    = 'Dispatch';
 
 /*

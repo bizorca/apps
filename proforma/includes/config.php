@@ -29,7 +29,7 @@ define('APP_URL',  'https://tools.bizorca.com' . PF_BASE);   // absolute base fo
 define('SMTP2GO_API_KEY', (string) tl_env('SMTP2GO_API_KEY', ''));
 define('SMTP2GO_API_URL', 'https://api.smtp2go.com/v3/');
 define('EMAIL_FROM_NAME', 'ProForma');
-define('EMAIL_FROM_ADDR', 'jassen@bizorca.com');
+define('EMAIL_FROM_ADDR', 'noreply@bizorca.com');
 
 // Monthly digest endpoint secret, matched by the Cloudways cron URL.
 define('CRON_SECRET', (string) tl_env('PF_CRON_SECRET', ''));

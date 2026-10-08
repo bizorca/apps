@@ -39,7 +39,7 @@
         <span class="text-brand-600">Bizorca</span> Tools
       </a>
       <div class="flex items-center gap-5">
-        <a href="#book" class="hidden sm:inline text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Book a Call</a>
+        <a href="#book" class="hidden sm:inline text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Book a Sounding</a>
         <a href="/account/login.php" class="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors">Sign in</a>
         <a href="#request" class="text-sm font-medium bg-brand-600 text-white px-4 py-2 rounded-lg hover:bg-brand-700 transition-colors">
           Request a Tool
@@ -468,18 +468,18 @@
     </div>
   </section>
 
-  <!-- Book a consultation -->
+  <!-- Book a sounding session -->
   <section id="book" class="max-w-5xl mx-auto px-6 py-20">
     <div class="max-w-3xl mx-auto text-center mb-10">
-      <h2 class="text-2xl font-bold text-slate-900 mb-4">Book a free consultation</h2>
+      <h2 class="text-2xl font-bold text-slate-900 mb-4">Book a sounding session</h2>
       <p class="text-slate-600 leading-relaxed">
-        Tell me what you're trying to build or what problem you're trying to solve. We'll spend 30 minutes figuring out whether a custom app is the right answer — and what that would actually look like.
+        A sounding is a paid business analysis session, not a sales call. Sailors take soundings to learn how much water is under the keel before they commit to a course. This is the business version: we go through how your business actually runs, from the numbers and the systems to where the hours go, and you leave knowing where it's deep enough to build and where you're about to run aground. If a custom tool is the answer, you'll know exactly what it should do. If it isn't, you'll know that too.
       </p>
     </div>
 
     <div class="text-center">
-      <a href="https://tidycal.com/jassen/app-consult" target="_blank" rel="noopener" class="inline-block bg-brand-600 text-white font-semibold px-8 py-4 rounded-lg hover:bg-brand-700 transition-colors text-lg">
-        Book a Free Consultation
+      <a href="https://tidycal.com/jassen/sounding" target="_blank" rel="noopener" class="inline-block bg-brand-600 text-white font-semibold px-8 py-4 rounded-lg hover:bg-brand-700 transition-colors text-lg">
+        Book a Sounding Session
       </a>
     </div>
 
@@ -508,8 +508,8 @@
       var messages = {
         sent:    ['Got it. Thanks for the request; I\'ll reply by email if I have questions.', 'bg-emerald-50 text-emerald-800 border border-emerald-200'],
         invalid: ['Please fill in your name, a valid email, who you are, and what the tool should do.', 'bg-amber-50 text-amber-800 border border-amber-200'],
-        limited: ['That\'s a lot of requests in a short time. Try again in an hour, or email jassen@bizorca.com.', 'bg-amber-50 text-amber-800 border border-amber-200'],
-        error:   ['Something went wrong on my end. Please email jassen@bizorca.com instead.', 'bg-red-50 text-red-800 border border-red-200']
+        limited: ['That\'s a lot of requests in a short time. Please try again in an hour.', 'bg-amber-50 text-amber-800 border border-amber-200'],
+        error:   ['Something went wrong on my end. Please try again in a few minutes.', 'bg-red-50 text-red-800 border border-red-200']
       };
       var m = state && messages[state];
       if (!m) return;
