@@ -6,6 +6,8 @@
 Formerly apps.bizorca.com (static portfolio on SiteGround); moved to Cloudways and renamed 2026-10-07. apps.bizorca.com redirects here via a Cloudflare redirect rule (wildcard `https://apps.bizorca.com/*` → `https://tools.bizorca.com/`).
 
 ## Porting a tool in
+Ported so far (2026-10-07/08): proforma, kit, tinybooks, thinkrep, lattice, dispatch, fathom, foundry, pilotage, burnrate, astrology, placecard, timebank, commonweal, numbrella, pod, anglerfish. **Anglerfish is private**: every page calls `tl_require_admin()`, it has no landing card and must never get one; its worker API authenticates by bearer token (`AF_WORKER_TOKEN`).
+
 Each tool gets **its own folder at the repo root holding everything it needs** (`proforma/` is the reference). The original project directory is deleted once the port is verified, so nothing may be left behind in it. Read `proforma/CLAUDE.md` for the worked example; the recipe:
 
 1. Copy the app into `<tool>/`: `public/` (web files), `includes/`, `templates/`, `migrations/`, `bin/`.
