@@ -1,0 +1,22 @@
+-- Pilotage — 021 drop the legacy document tags column
+--
+-- `pl_documents.tags` was a comma-separated string, superseded by the real tag
+-- model in 013. The three failings that motivated the replacement are recorded
+-- in that migration's header: you cannot enumerate, you cannot match exactly,
+-- and you cannot rename or merge.
+--
+-- It has been dead since then. `Tags::migrateDocumentStrings()` existed to carry
+-- old values across, and every environment reports zero rows using it —
+-- development, test, and production alike. There was never any data to carry,
+-- because the tag model shipped before the column had been used in anger.
+--
+-- So the column goes, and the migrator goes with it. A method whose only job is
+-- to read a column that no longer exists is not a safety net; it is a method
+-- that throws.
+--
+-- If a future install somehow does have data here, this migration will drop it.
+-- That is stated rather than guarded against, because guarding would mean
+-- carrying a comma-splitting routine in SQL forever to protect data that has
+-- never existed on any known installation.
+
+ALTER TABLE `pl_documents` DROP COLUMN `tags`;

@@ -35,6 +35,7 @@ TOOLS=(
   dispatch
   fathom
   foundry
+  pilotage
 )
 
 # Directories in the server web root that belong to something else and must

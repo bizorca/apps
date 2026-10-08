@@ -1,0 +1,22 @@
+# Server-side only, never committed (house rule)
+.env
+.env.*
+!.env.example
+
+# SiteGround web root is a copy of public/ — do not track it
+public_html/
+
+# Runtime
+storage/
+*.log
+.DS_Store
+
+# Uploaded client files live outside the web root and outside the repo
+files/
+uploads/
+
+# Editor
+.idea/
+.vscode/
+*.swp
+.gstack/
