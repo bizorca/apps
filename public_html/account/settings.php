@@ -48,6 +48,10 @@ tl_card_open('Your account', 'Signed in as <strong>' . tl_h($user['email']) . '<
         <?= tl_field('password', 'New password (10+ characters)', 'password', '', 'new-password', false) ?>
         <button type="submit" class="<?= TL_BUTTON ?>">Save</button>
       </form>
+      <p class="text-sm text-slate-500 text-center mt-6">
+        <a href="/account/billing.php" class="hover:text-brand-600">Membership and billing</a>
+        <?php if ($user['is_admin']): ?> &middot; <a href="/account/billing-admin.php" class="hover:text-brand-600">Billing admin</a><?php endif; ?>
+      </p>
 <?php
 tl_card_close();
 tl_page_close();

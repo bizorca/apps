@@ -12,6 +12,16 @@ return [
     'SMTP2GO_API_KEY' => '',   // shared bizorca.com SMTP2GO account; empty = log to data/mail.log
     'MAIL_FROM'       => 'Bizorca Tools <tools@bizorca.com>',
 
+    // Billing (one membership, /account/billing.php). Every tool is free until
+    // TL_BILLING_ENFORCE is true AND the tool is listed in TL_PAID_TOOLS.
+    'STRIPE_SECRET_KEY'      => '',   // sk_live_... (server only)
+    'STRIPE_WEBHOOK_SECRET'  => '',   // whsec_... for https://tools.bizorca.com/account/stripe-webhook.php
+    'STRIPE_PRICE_MONTHLY'   => '',   // price_... ($33/mo)
+    'STRIPE_PRICE_ANNUAL'    => '',   // price_... ($330/yr)
+    'TL_BILLING_ENFORCE'     => false,
+    'TL_PAID_TOOLS'          => '',   // e.g. 'proforma,fathom'; empty = all free
+    // TL_MEMBERSHIP_MONTHLY_CENTS / TL_MEMBERSHIP_ANNUAL_CENTS: display prices (default 3300 / 33000)
+
     // Proforma
     'ANTHROPIC_API_KEY'     => '',   // Market Intel playbooks (Claude Haiku)
     'GOOGLE_PLACES_API_KEY' => '',   // optional geocoding
