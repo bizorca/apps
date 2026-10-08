@@ -32,4 +32,9 @@ return [
     // Optional: PL_ORIGIN, PL_MAIL_FROM, PL_MAIL_FROM_NAME, PL_INTAKE_HOUSE_TENANT (default bizorca),
     // PL_BILLING_BETA, PL_BILLING_ENFORCE (keep false), PL_STRIPE_*, PL_GOOGLE_CLIENT_*,
     // PL_MICROSOFT_CLIENT_*, PL_ENV, PL_DEBUG
+
+    // Numbrella: reports are free while payments are off
+    'NB_PAYMENTS_ENABLED'      => false,
+    'NB_STRIPE_WEBHOOK_SECRET' => '',   // whsec_... only needed if payments are switched on
+    // Optional: NB_PRICE_STANDARD_CENTS (2900), NB_PRICE_PREMIUM_CENTS (9900)
 ];

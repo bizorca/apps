@@ -41,6 +41,7 @@ TOOLS=(
   placecard
   timebank
   commonweal
+  numbrella
 )
 
 # Directories in the server web root that belong to something else and must
