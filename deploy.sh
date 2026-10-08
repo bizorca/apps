@@ -36,6 +36,7 @@ TOOLS=(
   fathom
   foundry
   pilotage
+  burnrate
 )
 
 # Directories in the server web root that belong to something else and must
