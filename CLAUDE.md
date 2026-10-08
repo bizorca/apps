@@ -39,6 +39,15 @@ Everything shared is `tl_`-prefixed so it never collides with a tool's own helpe
 ## Accounts
 Adapted from financialhypnosis.com's shared account (`hypnosis/website/ACCOUNTS.md`). One `users` table, session cookie `tools_session` at path `/`, so signing in once covers every tool. **The session is lazy**: `tl_user()` never creates one, so anonymous visitors get no cookie; only sign-in, registration and form CSRF tokens create a session. Pages: `/account/login.php`, `register.php`, `logout.php` (POST + CSRF; a GET shows a confirm button), `forgot.php`, `reset.php`, `settings.php`. URLs end in `.php` because there are no rewrites (below). `tl_safe_next()` guards every `?next=` redirect.
 
+## Billing (membership)
+Ported from billing.bizorca.com 2026-10-08 as **one membership** ($33/mo, $330/yr, live Stripe prices) that unlocks every paid tool. There is no per-tool plan matrix.
+- **Every tool is free right now**: `TL_BILLING_ENFORCE` is false and `TL_PAID_TOOLS` is empty (both in the server `.env.php`). A tool is gated only when enforcement is on AND it is listed.
+- Tools ask `tl_has_access('<tool>')` / `tl_require_access('<tool>')` (`private_html/includes/billing.php`). Site admins always pass. No tool calls it yet; wire it into a tool's own access seam when that tool becomes paid.
+- Membership = a `tl_subscriptions` row in active/trialing/past_due/unpaid (Stripe's own status) or an unexpired `tl_comps` row. `users.is_paid` is a synced cache.
+- Pages: `/account/billing.php` (subscribe via Stripe Checkout, manage via the Stripe portal), `/account/billing-admin.php` (site admins: subscribers, comps, MRR), `/account/stripe-webhook.php`.
+- Stripe over REST with curl, `Stripe-Version: 2024-06-20`. Webhook endpoint `we_1UO8i1KQmTeMaePs7io89zSd` (checkout.session.completed, customer.subscription.created/updated/deleted), registered by API 2026-10-08; signatures verified with a 5-minute window, each event id handled once (`tl_stripe_events`).
+- The old billing.bizorca.com webhook endpoint still exists on the Stripe account and points at a dead host; delete it in the Stripe dashboard once nothing needs it.
+
 ## Request-a-tool form
 `public_html/request.php`: same-origin check instead of a CSRF token (the landing page is static), honeypot + 3s minimum + 5/hour per IP (CF-Connecting-IP). Every request is appended to `private_html/data/tool-requests.jsonl` before mailing, then mailed to jassen@bizorca.com with Reply-To set to the requester.
 
