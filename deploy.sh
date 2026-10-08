@@ -37,6 +37,7 @@ TOOLS=(
   foundry
   pilotage
   burnrate
+  astrology
 )
 
 # Directories in the server web root that belong to something else and must
