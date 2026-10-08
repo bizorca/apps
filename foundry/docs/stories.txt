@@ -1,0 +1,70 @@
+Good. Solid foundation. Here's where I land on all of this before a single    
+  line of code gets written.                                                    
+                                                                                
+  ---                                                                           
+  The Tech Stack Plan                                                           
+                                                                                
+  Vanilla PHP 8 + Tailwind CDN, mirroring the architecture of the login app.    
+  Front controller pattern (public/index.php), PDO for MySQL, no Composer       
+  dependencies beyond the SSO client we copy from login. Views are plain PHP    
+  templates. Clean and maintainable by one person.                              
+                                                                                
+  ---                                                                           
+  The Landing Page
+                  
+  Before I build it, I want to push back on one assumption: the process and 
+  deliverables are not what converts a visitor into an applicant. They matter,  
+  but they're secondary. What converts is resonance with a specific problem the 
+  person already knows they have. The E-Myth problem is visceral — you built a  
+  business and it just became a job you can't quit. That's the hook.         
+
+  The page structure I'd build:                                                 
+  
+  1. Hero — A single sharp statement about the problem. Not "here's what I do," 
+  but "here's the trap you're in."                                           
+  2. The Problem (E-Myth in plain English) — Most businesses fail the owner, not
+   because they fail. They succeed at the work and fail as businesses. The owner
+   IS the business.
+  3. The Solution — Building the franchise prototype: a business that works     
+  without you. Documented systems, defined roles, repeatable processes.         
+  4. Why This Is Different — The combination nobody else brings: built and sold
+  businesses, turned around hundreds of small ones, invested in 30 startups with
+   full due diligence, plus accounting/tax/marketing, plus the ability to    
+  actually build the software tools that implement the systems.                 
+  5. The Process — Four phases: Audit → Architecture → Build → Handoff       
+  6. The Deliverables — Concrete list. Not "strategies and frameworks" — actual 
+  outputs.                                                                      
+  7. Who This Is For / Who It Isn't — Application-only for a reason.            
+  8. Apply CTA                                                                  
+                                                                                
+  ---                                                                           
+  I Need Three Stories From You Before I Write the Copy                         
+                                                                                
+  Per how I work on content: wherever a human interest angle significantly
+  strengthens the narrative, you write it. Here are the three moments I need:   
+                                                                             
+  Story 1 — The E-Myth trap in the wild.                                        
+  A specific client (anonymized is fine) you worked with who was completely  
+  trapped in the business. What did that look like day-to-day? What was the     
+  moment you realized the problem? What changed after you built the systems? 
+  Write me a paragraph in your own voice — I'll drop it in verbatim.            
+                                                                             
+  Story 2 — The "I've done this myself" moment.                                 
+  From building or selling one of your own businesses: what had to be true about
+   the systems for it to be sellable/transferable? Or if you'd rather, a moment 
+  where you didn't have the system and it cost you. Your choice. One paragraph.
+                                                                                
+  Story 3 — The investor's view.                                             
+  From your 30 startup investments and due diligence work: what did you see over
+   and over in businesses that couldn't scale? What does the absence of the     
+  franchise prototype actually look like in a cap table conversation or a pitch
+  deck? One paragraph.                                                          
+                                                                             
+  These three stories are the difference between a landing page that looks like 
+  every other consultant's site and one that actually converts.
+                                                                                
+  ---                                                                        
+  While You Write Those
+                       
+  I'll save the project context and start scaffolding the PHP app structure so
+  we're ready to build the moment you have the copy. Sound good?         

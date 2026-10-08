@@ -10,7 +10,7 @@
 #   public_html/            -> public_html/              landing page, request form, /account
 #   private_html/           -> private_html/             shared core: includes, migrations, bin
 #   <tool>/public/          -> public_html/<tool>/       one per entry in TOOLS
-#   <tool>/{includes,...}   -> private_html/<tool>/      everything else in the tool's folder
+#   <tool>/{includes,...}   -> private_html/<tool>/      everything else except docs/ (repo-only)
 #
 # private_html is outside the web root. Server-only files there are never
 # touched: .env.php (secrets) and data/ (request log, mail log, rate limits).
@@ -102,7 +102,7 @@ for t in ${TOOLS[@]+"${TOOLS[@]}"}; do
     "${RSYNC[@]}" -i "$BUILD/$t/public/" "${SSH_HOST}:${APP}/public_html/$t/"
     # bin/ (CLI scripts) goes to private_html with the rest: anything in the
     # web root of an nginx-only Cloudways app is reachable over HTTP.
-    "${RSYNC[@]}" -i --exclude='/public/' --exclude='/data/' "$BUILD/$t/" "${SSH_HOST}:${APP}/private_html/$t/"
+    "${RSYNC[@]}" -i --exclude='/public/' --exclude='/data/' --exclude='/docs/' "$BUILD/$t/" "${SSH_HOST}:${APP}/private_html/$t/"
 done
 
 if [[ ${#DRY[@]} -gt 0 ]]; then
