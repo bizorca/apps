@@ -33,6 +33,7 @@ TOOLS=(
   thinkrep
   lattice
   dispatch
+  fathom
 )
 
 # Directories in the server web root that belong to something else and must
