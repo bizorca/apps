@@ -5,7 +5,7 @@ A simple bookkeeping web app for small service-based businesses and non-profits 
 
 **Lives at** https://tools.bizorca.com/tinybooks/, one tool on the shared tools platform. Read `../CLAUDE.md` (the repo root) first for the platform: shared account, shared MySQL, deploy.
 
-**Ported 2026-10-07** from the standalone `Archipelago/tinybooks/` (SQLite, own login, never deployed: tinybooks.bizorca.com never had DNS and no server held an install). There were no live books to migrate.
+**Ported 2026-10-07** from the standalone `Archipelago/tinybooks/` (now `deprecated/tinybooks/`) (SQLite, own login, never deployed: tinybooks.bizorca.com never had DNS and no server held an install). There were no live books to migrate.
 
 ## Stack
 - PHP 8.2, vanilla, page-per-file, no build step; Tailwind from CDN
