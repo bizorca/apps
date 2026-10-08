@@ -42,6 +42,7 @@ TOOLS=(
   timebank
   commonweal
   numbrella
+  pod
 )
 
 # Directories in the server web root that belong to something else and must

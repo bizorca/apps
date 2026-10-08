@@ -37,4 +37,10 @@ return [
     'NB_PAYMENTS_ENABLED'      => false,
     'NB_STRIPE_WEBHOOK_SECRET' => '',   // whsec_... only needed if payments are switched on
     // Optional: NB_PRICE_STANDARD_CENTS (2900), NB_PRICE_PREMIUM_CENTS (9900)
+
+    // Pod: Zoom Server-to-Server OAuth (marketplace.zoom.us); empty = Zoom box hidden
+    'PD_ZOOM_ACCOUNT_ID'    => '',
+    'PD_ZOOM_CLIENT_ID'     => '',
+    'PD_ZOOM_CLIENT_SECRET' => '',
+    // Optional: PD_ORIGIN
 ];
