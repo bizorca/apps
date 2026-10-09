@@ -1,0 +1,86 @@
+Mobile app studio built around the local business budget
+⏰
+Perfect Timing
+✅
+Product Ready
++13 More
+Agencies quote six months. Freelancers quote three weeks and disappear at week two. Template platforms quote nothing and deliver something that takes a developer to configure anyway. The local business owner sits in the middle of three broken options, watching competitors with better-funded tech stacks pull customers away one convenience feature at a time.
+
+A local business gets a custom mobile app in three to seven days for a flat fee between $1,500 and $4,500. One discovery call maps the requirements. AI-assisted development handles the build: loyalty systems, ordering flows, booking calendars. Testing, App Store deployment, and launch support are included. After launch, a $75 per month maintenance plan covers hosting, updates, and ongoing support. The business gets an app built to its exact operation, not a template stretched to fit.
+
+The wrong approach is starting with the technology. No-code frameworks and AI coding tools are inputs, not the product. Start instead with three to five free or discounted builds for local businesses in a single category: restaurants, salons, or independent retailers. Use those builds to stress-test the discovery process, identify configuration decisions that slow every project, and build reusable components that make the next build faster. The repeatable system is the asset. When a restaurant build takes two days instead of five, margin on every subsequent project compounds.
+
+At $75 per month, the maintenance plan costs less than a single hour of agency time. Switching means rebuilding from scratch with someone who doesn't know the business. That friction keeps clients on the plan. Local business consultants who carry trust with the buyer are the distribution path. White-labelling the service at $10K to $25K per package opens a second revenue channel without adding acquisition cost. Cobbled becomes the build layer underneath every local business tech stack that gets sold.
+
+Value Ladder Strategy
+A strategic progression of offers that build trust and maximize customer lifetime value.
+
+LEAD MAGNET
+
+App Success Case Studies
+Free
+Free downloadable case studies showcasing successful app launches with our service.
+
+Value Provided
+
+Demonstrates real-world impact and builds trust with potential clients.
+
+Goal
+
+Generate leads and capture interest in the service.
+
+FRONTEND OFFER
+
+Starter App Package
+$1,000
+Affordable entry-level package providing a custom app using a basic template.
+
+Value Provided
+
+Quick, affordable app development tailored for local businesses.
+
+Goal
+
+Acquire early clients and validate the service offering.
+
+CORE OFFER
+
+Premium App Build Service
+$3,000–$5,000
+Complete custom app build with industry-specific features and branding.
+
+Value Provided
+
+High-quality, fully custom app delivered rapidly, addressing specific business needs.
+
+Goal
+
+Drive core revenue through comprehensive app development.
+
+CONTINUITY PROGRAM
+
+Monthly Maintenance & Support Subscription
+$75/month
+Monthly support and maintenance, including updates and minor changes.
+
+Value Provided
+
+Continuous support and peace of mind for app performance and updates.
+
+Goal
+
+Ensure recurring revenue and ongoing client engagement.
+
+BACKEND OFFER
+
+Advanced Feature Add-Ons
+$250–$500/feature
+Add premium features such as e-commerce integration or advanced analytics.
+
+Value Provided
+
+Enhanced app capabilities tailored to specific business growth needs.
+
+Goal
+
+Capture high-value clients through advanced features.
