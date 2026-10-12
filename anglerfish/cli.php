@@ -317,7 +317,7 @@ if ($cmd === 'daily-import') {
 }
 
 if ($cmd === 'daily-reserve') {
-    echo json_encode(\Anglerfish\Models\DailyIdea::reserve(max(1, min(60, (int) ($opts['days'] ?? 7)))),
+    echo json_encode(\Anglerfish\Models\DailyIdea::reserve(max(1, min(120, (int) ($opts['days'] ?? 90)))),
         JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT), "\n";
     exit;
 }

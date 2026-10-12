@@ -32,6 +32,8 @@ final class DailyIdea
     public const IMAGE_MODEL = 'gemini-3-pro-image';
     public const ATTRIBUTION = 'hypnologue';
     private const MAX_TRIES  = 3;
+    public const BATCH       = 90;    // days written per Claude Code session
+    public const REMIND_AT   = 14;    // remind when this few written days are left
 
     public const STATUSES = [
         'reserved' => 'Reserved',
@@ -269,8 +271,7 @@ final class DailyIdea
     {
         $direction = json_decode((string) $row['direction'], true) ?: [];
         $source = 'Hypnosis Brain' . ($row['citation'] !== '' ? ' · ' . $row['citation'] : '');
-        $prompt = ImagePrompt::fromDirection($direction, 'infographic', $source,
-            ImagePrompt::ATTRIBUTIONS[self::ATTRIBUTION]['line'] ?? null);
+        $prompt = ImagePrompt::fromDirection($direction, 'infographic', $source, self::ATTRIBUTION);
         Database::run('UPDATE af_daily_sends SET image_tries = image_tries + 1, image_prompt = ? WHERE id = ?',
             [$prompt, (int) $row['id']]);
         try {
@@ -347,7 +348,9 @@ final class DailyIdea
             $image = null;
         }
 
-        $parts = self::emailParts($idea, $queued ? (string) $row['distilled'] : '', $link, $image !== null);
+        $left = (int) Database::value(
+            "SELECT COUNT(*) FROM af_daily_sends WHERE status = 'queued' AND send_date > ?", [$row['send_date']]);
+        $parts = self::emailParts($idea, $queued ? (string) $row['distilled'] : '', $link, $image !== null, $left);
         if ($dryRun) {
             return "To: $to\nSubject: $subject\nImage: " . ($image ?? 'none') . "\n\n" . $parts['text'];
         }
@@ -368,8 +371,12 @@ final class DailyIdea
         throw new \RuntimeException("SMTP2GO did not accept {$row['send_date']} (try $tries of " . self::MAX_TRIES . ').');
     }
 
-    private static function emailParts(array $idea, string $distilled, string $link, bool $hasImage): array
+    private static function emailParts(array $idea, string $distilled, string $link, bool $hasImage, int $left = 99): array
     {
+        $remind = $left <= self::REMIND_AT
+            ? ($left === 0 ? 'This is the last written Daily Idea in the queue.' : "Only $left written Daily Ideas are left in the queue.")
+              . ' Time to requeue: ask Claude Code to "queue ' . self::BATCH . ' days of Daily Ideas".'
+            : '';
         $title = self::niceTitle($idea['title']);
         $kicker = "Hypnosis Brain · {$idea['topic']} · " . self::niceTitle($idea['section']);
         $source = $idea['title'] . '. ' . $idea['body'];
@@ -379,12 +386,14 @@ final class DailyIdea
 
         $text = "$title\n$kicker\n\n"
               . ($distilled !== '' ? "The distilled idea\n\n$distilled\n\n" : "$dry\n\n")
-              . "From the brain\n\n$source\n$cite\n\nThe idea page: $link\n";
+              . "From the brain\n\n$source\n$cite\n\nThe idea page: $link\n"
+              . ($remind !== '' ? "\nREQUEUE: $remind\n" : '');
 
         $p = static fn(string $s) => implode('', array_map(
             static fn($para) => '<p style="margin:0 0 14px">' . nl2br(h(trim($para))) . '</p>',
             preg_split('/\n\s*\n/', trim($s)) ?: []));
         $html = '<div style="max-width:680px;margin:0 auto;font:16px/1.55 Georgia,serif;color:#26303B">'
+              . ($remind !== '' ? '<p style="font:14px Helvetica,Arial,sans-serif;background:#FFF4D6;border:1px solid #D4A017;padding:10px 14px;margin:0 0 18px"><strong>Requeue:</strong> ' . h($remind) . '</p>' : '')
               . ($hasImage ? '<img src="cid:plate.jpg" alt="' . h($title) . '" style="width:100%;height:auto;border:1px solid #e5e5e5;margin-bottom:18px">' : '')
               . '<h1 style="font-size:24px;color:#1B3A5C;margin:0 0 4px">' . h($title) . '</h1>'
               . '<div style="font:12px Helvetica,Arial,sans-serif;color:#58616D;margin-bottom:20px">' . h($kicker) . '</div>'
