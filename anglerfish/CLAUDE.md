@@ -23,7 +23,7 @@ Jassen's private content production desk: ingests books, extracts structured kno
 - **Keys** in `private_html/.env.php`: `AF_ANTHROPIC_API_KEY`, `AF_ANTHROPIC_MODEL`, `AF_GEMINI_API_KEY`, `AF_WORKER_TOKEN` (copied from the SiteGround `.env.php`; the worker's `.env` holds the same token).
 
 ## Server jobs
-- `php cli.php work` drains queued server-side jobs (art direction, Gemini batches, compose). **Cloudways cron, every minute:** `cd /home/master/applications/qukjzcxeas/private_html/anglerfish && php cli.php work`. Page loads also tick via `/tick`.
+- `php cli.php work` drains queued server-side jobs (art direction, Gemini batches, compose). **Master crontab, every minute** (`crontab -l` as master over SSH), logging to `private_html/data/anglerfish/logs/work.log`. **It did not exist until 2026-10-12**: the SiteGround cron never came over at the port, so nothing drained the queue on Cloudways for four days (three `generate_image` jobs sat queued from 2026-10-05). The Daily Idea cron is a separate line in the same crontab. Page loads also tick via `/tick`.
 - `php cli.php status`, `publications`, `batches`, `weekly-import`, `video-import`, `hypno-import`, `qa-export`... see `docs/press-CLAUDE.md`. Run from `private_html/anglerfish` as `ssh cloudways-bizorca 'cd applications/qukjzcxeas/private_html/anglerfish && php cli.php status'`.
 - `bin/smoke.php` runs the front controller for every GET route as the first site admin (needs `public/index.php` reachable: on the server it reads `public_html/anglerfish/index.php`).
 - `bin/import_*.php`, `bin/batch_probe.php`: the original one-off importers, now booted through the shared core.
@@ -36,7 +36,6 @@ One Hypnosis Brain item emailed to jassen.bowman@gmail.com at 6am Pacific with a
 - **Batches of 90:** Jassen's standing instruction (2026-10-12) is to write 90 days at a time in Claude Code (`pull --days=90`, then write every brief; parallel agents are fine). When 14 or fewer written days remain after the one being sent, the email carries a REQUEUE notice (`DailyIdea::BATCH`, `REMIND_AT`).
 - **By hand:** `daily-send --dry-run | --now`, `daily-draw --date=YYYY-MM-DD` (redraw).
 - **Pages:** `/daily` (roster with status tabs and thumbnails), `/daily/<idea id>` (the page each email links to: plate, explainer, item, the image prompt), `/daily/plate/<row id>[?w=1]`.
-- The `cli.php work` cron for queued jobs did not appear to run on 2026-10-12 (3 `generate_image` jobs queued since 2026-10-05); Daily Idea does not depend on it.
 
 ## The Mac worker (`writer/press/worker`, not in this repo)
 Runs from launchd (`com.bizorca.anglerfish.*.plist`), polls the server over HTTPS and pushes files over SSH. Its target is set in `worker/.env`:
