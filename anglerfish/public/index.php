@@ -42,6 +42,7 @@ use Anglerfish\Controllers\TickController;
 use Anglerfish\Controllers\LibraryController;
 use Anglerfish\Controllers\TriageController;
 use Anglerfish\Controllers\VideoController;
+use Anglerfish\Controllers\DailyController;
 use Anglerfish\Controllers\WeeklyController;
 use Anglerfish\Controllers\WorkerController;
 
@@ -85,6 +86,8 @@ $router->get('/videos',            [VideoController::class, 'index']);
 $router->get('/videos/{number}/script.txt', [VideoController::class, 'download']);
 $router->get('/videos/{number}',   [VideoController::class, 'show']);
 $router->post('/videos/{number}',  [VideoController::class, 'update']);
+$router->get('/daily',             [DailyController::class, 'index']);
+$router->get('/daily/{id}',        [DailyController::class, 'show']);
 $router->get('/corpus',            [CorpusController::class, 'index']);
 $router->post('/corpus/deep',      [CorpusController::class, 'deep']);
 $router->post('/corpus/clip',      [CorpusController::class, 'clip']);

@@ -293,6 +293,35 @@ if ($cmd === 'hypno') {
 }
 
 
+// ── Daily Idea (migration 002) ───────────────────────────────────────────────
+//
+//   php cli.php daily-import --from=storage/incoming/daily-ideas.jsonl
+//   php cli.php daily-send            send if due (6am Pacific, once a day); cron
+//   php cli.php daily-send --now      send one now regardless
+//   php cli.php daily-send --dry-run  print one, record and send nothing
+//   php cli.php daily-send --id=123   a specific item (with --now or --dry-run)
+
+if ($cmd === 'daily-import') {
+    $r = \Anglerfish\Models\DailyIdea::import((string) ($opts['from'] ?? ''));
+    echo "{$r['items']} items in the export, {$r['added']} new, {$r['retired']} retired\n";
+    exit;
+}
+
+if ($cmd === 'daily-send') {
+    $D = \Anglerfish\Models\DailyIdea::class;
+    $idea = isset($opts['id']) ? $D::find((int) $opts['id']) : null;
+    if (isset($opts['dry-run'])) {
+        $D::send($idea, (string) ($opts['to'] ?? $D::TO), true);
+        exit;
+    }
+    if (!isset($opts['now']) && !$D::due()) {
+        exit;
+    }
+    $s = $D::send($idea, (string) ($opts['to'] ?? $D::TO));
+    echo date('c') . " sent #{$s['id']} idea {$s['idea_id']} to {$s['to_email']}: {$s['subject']}\n";
+    exit;
+}
+
 if ($cmd === 'status') {
     printf("%-18s %-10s %s\n", 'TYPE', 'STATUS', 'N');
     foreach (Database::all(

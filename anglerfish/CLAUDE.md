@@ -28,6 +28,14 @@ Jassen's private content production desk: ingests books, extracts structured kno
 - `bin/smoke.php` runs the front controller for every GET route as the first site admin (needs `public/index.php` reachable: on the server it reads `public_html/anglerfish/index.php`).
 - `bin/import_*.php`, `bin/batch_probe.php`: the original one-off importers, now booted through the shared core.
 
+## Daily Idea (2026-10-12)
+One random Hypnosis Brain item emailed to jassen.bowman@gmail.com each morning, modelled on James Orr's daily email. Only the Hypnosis Brain feeds it.
+- **Pool:** `writer/Hypnosis Brain/export_daily.py --push` parses every `Big Ideas - *.txt` (skipping SOURCES & REFERENCES) into `daily-ideas.jsonl`, scps it to `incoming/` and runs `cli.php daily-import`, which upserts `af_daily_ideas` by a hash of topic + item text and marks items missing from the export inactive. Re-run it after `build_big_ideas.py`.
+- **Send:** `cli.php daily-send` (migration 002, `Models/DailyIdea.php`) is a no-op unless it is past 6am Pacific with no successful send today, and stops after 3 failed tries in a day. It picks a random topic (avoiding the last 7 days' topics), then a never-sent item in it, has Claude (`claude-sonnet-5-5`, effort low) write a 180-260 word explainer from the item alone, and mails it as plain text with `tl_mail()`. `--now`, `--dry-run`, `--id=N`, `--to=` for testing.
+- **Cron:** master crontab, `*/15 * * * *`, logs to `private_html/data/anglerfish/logs/daily.log`.
+- **Pages:** `/daily` (send log) and `/daily/<id>` (the idea page each email links to), admin-only like everything else.
+- No infographic per email (James's has one); the 20 technique plates in `Hypnosis Brain/infographics/` are hand-directed, and a Gemini render a day would be ~$0.13.
+
 ## The Mac worker (`writer/press/worker`, not in this repo)
 Runs from launchd (`com.bizorca.anglerfish.*.plist`), polls the server over HTTPS and pushes files over SSH. Its target is set in `worker/.env`:
 ```

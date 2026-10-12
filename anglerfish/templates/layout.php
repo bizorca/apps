@@ -166,6 +166,7 @@ document.addEventListener('alpine:init', () => {
       <a class="hover:text-gold" href="<?= url('/compose') ?>">Compose</a>
       <a class="hover:text-gold" href="<?= url('/posts') ?>">Posts</a>
       <a class="hover:text-gold" href="<?= url('/videos') ?>">Videos</a>
+      <a class="hover:text-gold" href="<?= url('/daily') ?>">Daily</a>
       <a class="hover:text-gold" href="<?= url('/corpus') ?>">Corpus</a>
       <span id="pending-count" title="jobs waiting"
             class="rounded bg-gold px-1 text-[10px] text-navy" style="display:none"></span>
