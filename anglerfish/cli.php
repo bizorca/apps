@@ -293,13 +293,22 @@ if ($cmd === 'hypno') {
 }
 
 
-// ── Daily Idea (migration 002) ───────────────────────────────────────────────
+// ── Daily Idea (migrations 002-003) ──────────────────────────────────────────
 //
-//   php cli.php daily-import --from=storage/incoming/daily-ideas.jsonl
-//   php cli.php daily-send            send if due (6am Pacific, once a day); cron
-//   php cli.php daily-send --now      send one now regardless
-//   php cli.php daily-send --dry-run  print one, record and send nothing
-//   php cli.php daily-send --id=123   a specific item (with --now or --dry-run)
+// Written in Claude Code (subscription), never by the API here. From the Mac:
+//   press/worker/daily_queue.py pull --days=7   reserve + write briefs
+//   press/worker/daily_queue.py push            validate + queue them
+// which call:
+//   php cli.php daily-import --from=...          refresh the idea pool
+//   php cli.php daily-reserve --days=7           JSON of rows needing writing
+//   php cli.php daily-queue --from=FILE [...]    import written days
+// Cron, every 15 minutes:
+//   php cli.php daily-send     draw the next plate; at 6am Pacific send today
+// By hand:
+//   php cli.php daily-send --dry-run             print today's email
+//   php cli.php daily-send --now                 send today's row now
+//   php cli.php daily-draw --date=YYYY-MM-DD     redraw one plate
+//   php cli.php daily-roster                     the next and last fortnight
 
 if ($cmd === 'daily-import') {
     $r = \Anglerfish\Models\DailyIdea::import((string) ($opts['from'] ?? ''));
@@ -307,18 +316,73 @@ if ($cmd === 'daily-import') {
     exit;
 }
 
+if ($cmd === 'daily-reserve') {
+    echo json_encode(\Anglerfish\Models\DailyIdea::reserve(max(1, min(60, (int) ($opts['days'] ?? 7)))),
+        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT), "\n";
+    exit;
+}
+
+if ($cmd === 'daily-queue') {
+    // --from is one file or a directory of them (a push drops a folder).
+    $from = (string) ($opts['from'] ?? '');
+    $files = is_dir($from) ? glob(rtrim($from, '/') . '/*.md') : [$from];
+    $bad = 0;
+    foreach ($files as $f) {
+        try {
+            $r = \Anglerfish\Models\DailyIdea::queue((string) file_get_contents($f));
+            echo "queued {$r['date']} ({$r['words']} words)\n";
+        } catch (\Throwable $e) {
+            $bad++;
+            echo 'REFUSED ' . basename($f) . ': ' . $e->getMessage() . "\n";
+        }
+    }
+    exit($bad ? 1 : 0);
+}
+
+if ($cmd === 'daily-draw') {
+    $D = \Anglerfish\Models\DailyIdea::class;
+    $row = \Anglerfish\Core\Database::one(
+        'SELECT s.*, i.citation FROM af_daily_sends s JOIN af_daily_ideas i ON i.id = s.idea_id WHERE s.send_date = ?',
+        [(string) ($opts['date'] ?? '')]);
+    echo $row ? $D::draw($row) . "\n" : "No roster row for that date.\n";
+    exit;
+}
+
+if ($cmd === 'daily-roster') {
+    foreach (\Anglerfish\Core\Database::all(
+        "SELECT s.send_date, s.status, s.image_path IS NOT NULL AS plate, i.topic, i.title
+           FROM af_daily_sends s JOIN af_daily_ideas i ON i.id = s.idea_id
+          WHERE s.send_date BETWEEN CURDATE() - INTERVAL 14 DAY AND CURDATE() + INTERVAL 30 DAY
+          ORDER BY s.send_date") as $r) {
+        printf("%s  %-8s %-5s %-34s %s\n", $r['send_date'], $r['status'], $r['plate'] ? 'plate' : '-',
+            mb_substr($r['topic'], 0, 34), mb_substr(\Anglerfish\Models\DailyIdea::niceTitle($r['title']), 0, 70));
+    }
+    exit;
+}
+
 if ($cmd === 'daily-send') {
     $D = \Anglerfish\Models\DailyIdea::class;
-    $idea = isset($opts['id']) ? $D::find((int) $opts['id']) : null;
+    $to = isset($opts['to']) ? (string) $opts['to'] : null;
     if (isset($opts['dry-run'])) {
-        $D::send($idea, (string) ($opts['to'] ?? $D::TO), true);
+        echo $D::sendToday(true, $to);
         exit;
     }
-    if (!isset($opts['now']) && !$D::due()) {
+    // One run at a time: a plate takes ~40s and the cron fires every 15 minutes,
+    // but a slow Gemini day should never start a second draw of the same row.
+    $lock = fopen(AF_STORAGE . '/daily.lock', 'c');
+    if (!$lock || !flock($lock, LOCK_EX | LOCK_NB)) {
         exit;
     }
-    $s = $D::send($idea, (string) ($opts['to'] ?? $D::TO));
-    echo date('c') . " sent #{$s['id']} idea {$s['idea_id']} to {$s['to_email']}: {$s['subject']}\n";
+    if (isset($opts['now']) || $D::due()) {
+        try {
+            echo date('c') . ' ' . $D::sendToday(false, $to) . "\n";
+        } catch (\Throwable $e) {
+            echo date('c') . ' ' . $e->getMessage() . "\n";
+        }
+    }
+    if ($msg = $D::drawNext()) {
+        echo date('c') . " $msg\n";
+    }
     exit;
 }
 

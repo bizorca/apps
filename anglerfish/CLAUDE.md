@@ -29,12 +29,13 @@ Jassen's private content production desk: ingests books, extracts structured kno
 - `bin/import_*.php`, `bin/batch_probe.php`: the original one-off importers, now booted through the shared core.
 
 ## Daily Idea (2026-10-12)
-One random Hypnosis Brain item emailed to jassen.bowman@gmail.com each morning, modelled on James Orr's daily email. Only the Hypnosis Brain feeds it.
-- **Pool:** `writer/Hypnosis Brain/export_daily.py --push` parses every `Big Ideas - *.txt` (skipping SOURCES & REFERENCES) into `daily-ideas.jsonl`, scps it to `incoming/` and runs `cli.php daily-import`, which upserts `af_daily_ideas` by a hash of topic + item text and marks items missing from the export inactive. Re-run it after `build_big_ideas.py`.
-- **Send:** `cli.php daily-send` (migration 002, `Models/DailyIdea.php`) is a no-op unless it is past 6am Pacific with no successful send today, and stops after 3 failed tries in a day. It picks a random topic (avoiding the last 7 days' topics), then a never-sent item in it, has Claude (`claude-sonnet-5-5`, effort low) write a 180-260 word explainer from the item alone, and mails it as plain text with `tl_mail()`. `--now`, `--dry-run`, `--id=N`, `--to=` for testing.
-- **Cron:** master crontab, `*/15 * * * *`, logs to `private_html/data/anglerfish/logs/daily.log`.
-- **Pages:** `/daily` (send log) and `/daily/<id>` (the idea page each email links to), admin-only like everything else.
-- No infographic per email (James's has one); the 20 technique plates in `Hypnosis Brain/infographics/` are hand-directed, and a Gemini render a day would be ~$0.13.
+One Hypnosis Brain item emailed to jassen.bowman@gmail.com at 6am Pacific with an explainer and an infographic plate, modelled on James Orr's daily email. Only the Hypnosis Brain feeds it. **The explainer and art direction are written in Claude Code on the subscription; the server never calls Claude for this** (the first version used the API; removed the same day). Brief and loop: `writer/daily-ideas/BRIEF.md`.
+- **Pool:** `writer/Hypnosis Brain/export_daily.py --push` parses every `Big Ideas - *.txt` (skipping SOURCES & REFERENCES) and runs `cli.php daily-import`, upserting `af_daily_ideas` by a hash of topic + item text. Re-run after `build_big_ideas.py`.
+- **Roster:** `af_daily_sends`, one row per date (unique), `reserved → queued → sent` (or `failed`). `writer/press/worker/daily_queue.py pull --days=N` calls `daily-reserve` (random topic avoiding ±6 days' topics, then an unused item) and writes briefs into `writer/daily-ideas/`; `push` validates (explainer 150-320 words, `validate_direction.py`) and calls `daily-queue`; `roster` prints `daily-roster`.
+- **Cron:** master crontab `*/15 * * * * ... php cli.php daily-send >> data/anglerfish/logs/daily.log`, under a flock. Each run draws at most one missing plate for a queued row within 3 days (`ServerJobs::run('generate_image')` with `ImagePrompt::fromDirection()`, Hypnologue footer, source line "Hypnosis Brain · citation"; stored on the roster row, not `af_assets`, so it stays out of `/review`), and after 6am sends today's row: HTML via SMTP2GO with the 1456px plate inline (cid), since Anglerfish URLs are admin-only and Gmail could not fetch a link. A date with nothing queued sends the raw item with a refill nudge. 3 tries each for plate and send.
+- **By hand:** `daily-send --dry-run | --now`, `daily-draw --date=YYYY-MM-DD` (redraw).
+- **Pages:** `/daily` (roster with status tabs and thumbnails), `/daily/<idea id>` (the page each email links to: plate, explainer, item, the image prompt), `/daily/plate/<row id>[?w=1]`.
+- The `cli.php work` cron for queued jobs did not appear to run on 2026-10-12 (3 `generate_image` jobs queued since 2026-10-05); Daily Idea does not depend on it.
 
 ## The Mac worker (`writer/press/worker`, not in this repo)
 Runs from launchd (`com.bizorca.anglerfish.*.plist`), polls the server over HTTPS and pushes files over SSH. Its target is set in `worker/.env`:

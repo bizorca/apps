@@ -87,6 +87,7 @@ $router->get('/videos/{number}/script.txt', [VideoController::class, 'download']
 $router->get('/videos/{number}',   [VideoController::class, 'show']);
 $router->post('/videos/{number}',  [VideoController::class, 'update']);
 $router->get('/daily',             [DailyController::class, 'index']);
+$router->get('/daily/plate/{id}',  [DailyController::class, 'plate']);
 $router->get('/daily/{id}',        [DailyController::class, 'show']);
 $router->get('/corpus',            [CorpusController::class, 'index']);
 $router->post('/corpus/deep',      [CorpusController::class, 'deep']);
