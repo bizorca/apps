@@ -147,3 +147,10 @@ Fixed-Scope Offers (4.1), Micro-Workshop Framework (4.3), Referral Source Map (4
 
 The Collections Calendar is the one the worked case most wants next — the health check
 already offers it as a "next instrument" pointer with nowhere to go.
+
+## To do (Jassen, 2026-10-20)
+- **Coaching sales pipeline and client education portal: spec only, nothing built.**
+  Look at how KokoroCRM (`kokoro/`) and TaxCRM (`taxcrm/`) structure their pipeline
+  stages and sales flow. Then spec a similar pipeline for selling coaching engagements,
+  plus a client education portal where an advisor's clients get learning material.
+  Write the spec first; build nothing until Jassen has read it.
