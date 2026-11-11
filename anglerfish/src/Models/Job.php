@@ -218,12 +218,26 @@ final class Job
     public static function fail(int $id, string $token, string $error): bool
     {
         // Back to queued for another attempt unless attempts are exhausted.
-        return Database::run(
+        $ok = Database::run(
             "UPDATE af_jobs
                 SET status = IF(attempts >= max_attempts, 'dead', 'queued'),
                     error = ?, finished_at = NOW(), lease_token = NULL, lease_expires_at = NULL
               WHERE id = ? AND lease_token = ?",
             [mb_substr($error, 0, 4000), $id, $token]
         ) > 0;
+
+        // A dead compose job used to leave its composition 'queued' forever,
+        // so the draft page spun with no error to show. Mark it failed.
+        $dead = Database::one("SELECT type, subject_type, subject_id FROM af_jobs WHERE id = ? AND status = 'dead'", [$id]);
+        if ($dead && $dead['subject_type'] === 'composition') {
+            if ($dead['type'] === 'compose') {
+                Database::run("UPDATE af_compositions SET status = 'failed', error = ? WHERE id = ? AND status <> 'done'",
+                    [mb_substr($error, 0, 1000), (int) $dead['subject_id']]);
+            } elseif ($dead['type'] === 'redeliver') {
+                Database::run('UPDATE af_compositions SET error = ? WHERE id = ?',
+                    ['Download rewrite failed: ' . mb_substr($error, 0, 900), (int) $dead['subject_id']]);
+            }
+        }
+        return $ok;
     }
 }

@@ -26,11 +26,20 @@ final class JobTick
     private const TIME_BUDGET = 70;
 
     /** Interactive types — always worth running immediately. */
-    private const URGENT = ['compose', 'generate_image'];
+    private const URGENT = ['generate_image'];
+
+    /**
+     * Jobs a web tick must never take. A weekly compose against the full style
+     * guide and story bank runs 85-115s, past this request's 90s API timeout,
+     * so a tick that grabbed one failed it three times in a row (composition
+     * 27, 2026-11-11). Cron's `cli.php work` runs them within a minute, with a
+     * five-minute timeout.
+     */
+    private const CRON_ONLY = ['compose', 'redeliver', 'audiobook_script'];
 
     public static function run(int $max = 2, bool $force = false): array
     {
-        $types = ServerJobs::types();
+        $types = array_values(array_diff(ServerJobs::types(), self::CRON_ONLY));
         $pending = self::pending($types);
 
         if ($pending === 0) {
