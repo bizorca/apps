@@ -108,8 +108,11 @@ final class DeliverableHtml
             . " (preview)</title><meta name='robots' content='noindex, nofollow'><style>$brand" . self::css() . '</style></head><body>'
             . "<div class='bar'>Preview of the download. Print it, or Save as PDF, to check the page count "
             . "(US Letter). The final PDF is rendered from the same template when the post is promoted.</div>"
-            . "<main><div class='eyebrow'>Bizorca Press &nbsp;·&nbsp; $eyebrow</div>"
+            // The table's tfoot repeats on every printed page and reserves the
+            // footer's room, so the fixed footer never sits on top of content.
+            . "<main><table class='pw'><tbody><tr><td><div class='eyebrow'>Bizorca Press &nbsp;·&nbsp; $eyebrow</div>"
             . '<h1>' . $e($spec['title'] ?? '') . "</h1><div class='rule'></div>" . implode('', $body)
+            . "</td></tr></tbody><tfoot><tr><td><div class='fspace'></div></td></tr></tfoot></table>"
             . "</main>$footer</body></html>";
     }
 
@@ -130,12 +133,16 @@ footer { width: 8.5in; margin: -40px auto 40px; padding: 0 0.85in 20px 0.95in; b
          font-family: Georgia, serif; font-size: 7pt; color: #58616D; line-height: 1.5; }
 footer .ft { border-top: 1px solid #D4A017; padding-top: 4px; }
 footer b { color: #1B3A5C; }
-@page { size: letter; margin: 0.7in 0.85in 1.0in 0.95in; }
+table.pw { width: 100%; border-collapse: collapse; }
+table.pw td { padding: 0; vertical-align: top; }
+.fspace { height: 0; }
+@page { size: letter; margin: 0.7in 0.85in 0.3in 0.95in; }
 @media print {
   body { background: #fff; }
   .bar { display: none; }
   main { width: auto; margin: 0; padding: 0; }
-  footer { position: fixed; bottom: -0.8in; left: 0; right: 0; width: auto; margin: 0; padding: 0; }
+  .fspace { height: 0.7in; }
+  footer { position: fixed; bottom: 0; left: 0; right: 0; width: auto; margin: 0; padding: 0; background: #fff; }
 }
 .eyebrow { font-family: var(--sans); font-size: 7.6pt; font-weight: bold; letter-spacing: 2.4px; text-transform: uppercase; color: var(--gold); }
 h1 { font-size: 19pt; line-height: 1.12; color: var(--navy); margin: 5px 0 7px; }
