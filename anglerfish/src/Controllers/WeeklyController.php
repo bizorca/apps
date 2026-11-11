@@ -62,6 +62,21 @@ final class WeeklyController
         ], 'Weekly');
     }
 
+    /** GET /weekly/drafts — every weekly draft not yet promoted to a post. */
+    public function drafts(): void
+    {
+        $rows = Database::all(
+            "SELECT c.id, c.title, c.status, c.module_id, c.deliverable, c.error, c.created_at,
+                    m.title AS module_title,
+                    (SELECT a.id FROM af_assets a WHERE a.subject_type = 'composition' AND a.subject_id = c.id
+                        AND a.target = 'weekly_deliverable' AND a.status = 'ready' ORDER BY a.id DESC LIMIT 1) AS pdf_id,
+                    c.deliverable_spec IS NOT NULL AS has_download
+               FROM af_compositions c LEFT JOIN af_modules m ON m.id = c.module_id
+              WHERE c.format = 'weekly' AND c.publication_id = 1 AND c.post_id IS NULL
+           ORDER BY c.module_id, c.id");
+        View::render('weekly-drafts', ['rows' => $rows], 'Weekly drafts');
+    }
+
     public function create(): void
     {
         $moduleId = (int) ($_POST['module_id'] ?? 0);
