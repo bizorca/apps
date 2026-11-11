@@ -432,7 +432,7 @@ if ($cmd === 'status') {
  *   { "intro": "...", "sections": [ ... ], "scoring": { ... } }
  *
  * `composition:` is how a rewrite gets back into the row it came from — the
- * operator pulls a draft into bizorca-drafts/, rewrites it in their own voice,
+ * operator pulls a draft into Substack Posts/Weekly Posts/, rewrites it in their own voice,
  * and pushes it back before promoting. Inserting a fresh row for a rewrite
  * would leave the machine draft behind as a second composition of the same
  * post.
@@ -495,6 +495,52 @@ if ($cmd === 'video-import') {
     }
     printf("video #%d filed: %s (%d words)\n", $number, $title, $words);
     exit(0);
+}
+
+/*
+ * Daily-format posts -> curriculum module, from writer/substack-tools/daily-modules.tsv
+ * (number, module, ...). Sets af_posts.module_id by post number on every
+ * non-weekly Bizorca post, and lists any daily post the file leaves out, so
+ * "every daily post maps to a module" is checkable rather than assumed.
+ *   php cli.php post-modules --from=storage/incoming/daily-modules.tsv [--dry-run]
+ */
+if ($cmd === 'post-modules') {
+    $file = (string) ($opts['from'] ?? '');
+    if ($file === '' || !is_file($file)) {
+        fwrite(STDERR, "--from=<file> is required and must exist\n");
+        exit(64);
+    }
+    $map = [];
+    foreach (file($file, FILE_IGNORE_NEW_LINES) as $line) {
+        if (preg_match('/^(\d+)\t(\d+)\t/', $line, $m)) {
+            $map[(int) $m[1]] = (int) $m[2];
+        }
+    }
+    $valid = array_map('intval', array_column(Database::all('SELECT id FROM af_modules'), 'id'));
+    $posts = Database::all(
+        "SELECT id, number, module_id FROM af_posts
+          WHERE format <> 'weekly' AND publication_id = 1");
+    $set = $same = 0;
+    $missing = [];
+    foreach ($posts as $p) {
+        $mod = $map[(int) $p['number']] ?? null;
+        if ($mod === null || !in_array($mod, $valid, true)) {
+            $missing[] = (int) $p['number'];
+            continue;
+        }
+        if ((int) $p['module_id'] === $mod) {
+            $same++;
+            continue;
+        }
+        if (empty($opts['dry-run'])) {
+            Database::run('UPDATE af_posts SET module_id = ? WHERE id = ?', [$mod, (int) $p['id']]);
+        }
+        $set++;
+    }
+    printf("%d daily posts: %d set%s, %d already right, %d unmapped%s\n",
+        count($posts), $set, empty($opts['dry-run']) ? '' : ' (dry run)', $same,
+        count($missing), $missing ? ' (' . implode(', ', $missing) . ')' : '');
+    exit($missing ? 1 : 0);
 }
 
 if ($cmd === 'weekly-import') {

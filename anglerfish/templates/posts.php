@@ -1,5 +1,6 @@
 <?php
 $fmtLabel = fn($f) => ucwords(str_replace('_', ' ', $f));
+$modTitle = array_column($modules, 'title', 'id');
 ?>
 <div class="flex items-end justify-between gap-6">
   <div>
@@ -9,6 +10,15 @@ $fmtLabel = fn($f) => ucwords(str_replace('_', ' ', $f));
   <form method="get" action="<?= AF_BASE ?>/" class="flex gap-2">
     <input type="hidden" name="r" value="/posts">
     <input type="hidden" name="format" value="<?= h($format) ?>">
+    <select name="module" onchange="this.form.submit()"
+            class="rounded border border-black/15 px-2 py-1.5 text-sm">
+      <option value="0">Every module</option>
+      <?php foreach ($modules as $m): ?>
+        <option value="<?= (int) $m['id'] ?>" <?= $module === (int) $m['id'] ? 'selected' : '' ?>>
+          <?= (int) $m['id'] ?>. <?= h($m['title']) ?> (<?= (int) $m['n'] ?>)
+        </option>
+      <?php endforeach; ?>
+    </select>
     <input name="q" value="<?= h($q) ?>" placeholder="Search titles and bodies…"
            class="rounded border border-black/15 px-3 py-1.5 text-sm w-64">
     <button class="rounded bg-navy px-3 py-1.5 text-sm text-cream hover:bg-navy2">Search</button>
@@ -46,6 +56,9 @@ $fmtLabel = fn($f) => ucwords(str_replace('_', ' ', $f));
       <?= h($fmtLabel($p['format'])) ?>
     </span>
     <span class="flex-1 text-sm font-bold text-navy"><?= h($p['title']) ?></span>
+    <span class="hidden w-48 shrink-0 truncate text-[11px] text-muted md:block">
+      <?= $p['module_id'] ? (int) $p['module_id'] . '. ' . h($modTitle[$p['module_id']] ?? '') : '<span class="text-red-600">no module</span>' ?>
+    </span>
     <?php if ($p['queued']): ?>
       <span class="text-[10px] font-bold text-gold">QUEUED</span>
     <?php endif; ?>

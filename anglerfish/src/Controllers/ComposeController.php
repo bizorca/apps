@@ -39,6 +39,20 @@ final class ComposeController
         ], 'Compose');
     }
 
+    /** Hypnologue's own list: its compositions, which otherwise only show up mixed into Compose's recent list. */
+    public function hypnologue(): void
+    {
+        $pub = \Anglerfish\Models\Publication::resolve('hypnologue');
+        View::render('hypnologue', [
+            'pub'  => $pub,
+            'rows' => Database::all(
+                'SELECT id, status, title, subtitle, created_at,
+                        CHAR_LENGTH(body) - CHAR_LENGTH(REPLACE(body, \' \', \'\')) + 1 AS words
+                   FROM af_compositions WHERE publication_id = ? ORDER BY id DESC',
+                [(int) $pub['id']]),
+        ], 'Hypnologue');
+    }
+
     public function create(): void
     {
         $type = (string) ($_POST['subject_type'] ?? 'freeform');

@@ -8,6 +8,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title><?= h($pageTitle ? "$pageTitle · Anglerfish Press" : 'Anglerfish Press') ?></title>
 <link rel="icon" href="data:image/svg+xml,<?= rawurlencode('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="38" r="18" fill="#1B3A5C"/><circle cx="25" cy="34" r="3.5" fill="#F7F3E7"/><path d="M50 38l10-7v14z" fill="#1B3A5C"/><path d="M30 20c-1-8 6-12 10-8" stroke="#1B3A5C" stroke-width="3" fill="none"/><circle cx="41" cy="12" r="5" fill="#D4A017"/></svg>') ?>">
+<style>[x-cloak]{display:none!important}</style>
 <script src="https://cdn.tailwindcss.com"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
 <script>
@@ -156,30 +157,55 @@ document.addEventListener('alpine:init', () => {
     <a href="<?= url('/dashboard') ?>" class="flex items-center gap-2 font-bold tracking-tight">
       <span class="text-gold">&#9679;</span> Anglerfish Press
     </a>
+    <?php
+      $queued = (int) \Anglerfish\Core\Database::value("SELECT COUNT(*) FROM af_triage WHERE mark='write_about'");
+      $unreviewed = (int) \Anglerfish\Core\Database::value(
+        "SELECT COUNT(*) FROM af_assets WHERE kind='infographic' AND status='ready'
+           AND reviewed_at IS NULL");
+      // Three menus, one per job: the shared library, and the two publications.
+      // Items are [label, route, badge html].
+      $menus = [
+        'Library' => [
+          ['Books', '/library', ''],
+          ['Queue', '/queue', '<span id="queue-count" class="ml-1 rounded bg-gold px-1 text-[10px] text-navy">' . $queued . '</span>'],
+          ['Images to review', '/review', $unreviewed ? '<span class="ml-1 rounded bg-gold px-1 text-[10px] text-navy">' . $unreviewed . '</span>' : ''],
+          ['Videos', '/videos', ''],
+        ],
+        'Bizorca' => [
+          ['Weekly posts', '/weekly', ''],
+          ['Daily drafts', '/posts', ''],
+          ['Compose', '/compose', ''],
+          ['Vault', '/kits', ''],
+          ['Marketing Brain', '/corpus', ''],
+        ],
+        'Hypnologue' => [
+          ['Posts', '/hypnologue', ''],
+          ['Daily Idea', '/daily', ''],
+        ],
+      ];
+    ?>
     <nav class="flex-1 flex items-center gap-5 text-sm">
       <a class="hover:text-gold" href="<?= url('/dashboard') ?>">Dashboard</a>
-      <a class="hover:text-gold" href="<?= url('/library') ?>">Library</a>
-      <a class="hover:text-gold" href="<?= url('/queue') ?>">Queue
-        <span id="queue-count" class="ml-0.5 rounded bg-gold px-1 text-[10px] text-navy"><?= (int) \Anglerfish\Core\Database::value("SELECT COUNT(*) FROM af_triage WHERE mark='write_about'") ?></span>
-      </a>
-      <a class="hover:text-gold" href="<?= url('/weekly') ?>">Weekly</a>
-      <a class="hover:text-gold" href="<?= url('/compose') ?>">Compose</a>
-      <a class="hover:text-gold" href="<?= url('/posts') ?>">Posts</a>
-      <a class="hover:text-gold" href="<?= url('/videos') ?>">Videos</a>
-      <a class="hover:text-gold" href="<?= url('/daily') ?>">Daily</a>
-      <a class="hover:text-gold" href="<?= url('/corpus') ?>">Corpus</a>
+      <?php foreach ($menus as $label => $items): ?>
+        <div class="relative" x-data="{ open: false }" @click.outside="open = false" @keydown.escape="open = false">
+          <button type="button" @click="open = !open" :aria-expanded="open"
+                  class="flex items-center gap-1 hover:text-gold">
+            <?= h($label) ?>
+            <?php if ($label === 'Library' && ($queued || $unreviewed)): ?>
+              <span class="h-1.5 w-1.5 rounded-full bg-gold"></span>
+            <?php endif; ?>
+            <span class="text-[9px] opacity-60">&#9662;</span>
+          </button>
+          <div x-show="open" x-cloak x-transition.opacity
+               class="absolute left-0 top-full z-20 mt-2 min-w-48 rounded border border-black/10 bg-white py-1 text-ink shadow-lg">
+            <?php foreach ($items as [$text, $route, $badge]): ?>
+              <a href="<?= url($route) ?>" class="flex items-center px-3 py-1.5 hover:bg-cream"><?= h($text) ?><?= $badge ?></a>
+            <?php endforeach; ?>
+          </div>
+        </div>
+      <?php endforeach; ?>
       <span id="pending-count" title="jobs waiting"
             class="rounded bg-gold px-1 text-[10px] text-navy" style="display:none"></span>
-      <a class="hover:text-gold" href="<?= url('/review') ?>">Images
-        <?php $unreviewed = (int) \Anglerfish\Core\Database::value(
-          "SELECT COUNT(*) FROM af_assets WHERE kind='infographic' AND status='ready'
-             AND reviewed_at IS NULL"); ?>
-        <?php if ($unreviewed): ?>
-          <span class="ml-0.5 rounded bg-gold px-1 text-[10px] text-navy"><?= $unreviewed ?></span>
-        <?php endif; ?>
-      </a>
-      <a class="hover:text-gold" href="<?= url('/kits') ?>">Vault</a>
-      <span class="text-white/30">Admin</span>
     </nav>
     <span class="text-xs text-white/60"><?= h($u['email']) ?></span>
     <a class="text-xs hover:text-gold" href="/account/settings.php">Account</a>

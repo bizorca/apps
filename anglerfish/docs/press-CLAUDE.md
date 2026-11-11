@@ -323,7 +323,7 @@ structure, hierarchy and real objects.
 - `fromDirection()` still accepts a v2 block (`elements`, no `sections`) by
   folding it into one section, because directions are snapshotted on assets
   and stored on posts.
-- The authored pass (`bizorca-drafts/prompts/01-art-direction.md`,
+- The authored pass (`substack-tools/prompts/01-art-direction.md`,
   `validate_direction.py`, `import_drafts`) is on the v3 shape. The importer
   derives `gemini_structure` from `layout`; the one directed draft (001) was
   rewritten and re-imported.
@@ -599,10 +599,10 @@ must be exact* rather than by how much text there is.
 ## Art direction authored in Claude Code
 
 Directions can be written ahead of publishing instead of generated at render.
-Read `../bizorca-drafts/prompts/01-art-direction.md` before starting a pass.
+Read `../substack-tools/prompts/01-art-direction.md` before starting a pass.
 
 ```
-bizorca-drafts/NNN-format-slug.txt        (read the post, append a block)
+Daily Drafts/NNN-format-slug.txt        (read the post, append a block)
   → validate_direction.py                (structure, fields, label discipline)
   → import_drafts.py --dry-run           (parse and report, touch nothing)
   → import_drafts.py                     (enqueue, wait, report)
@@ -768,7 +768,7 @@ API is deprecated, so this screen *is* the publishing path.
 replacing them. One shape (trap, diagnostic, protocol, Go!), slotted against one
 of twelve curriculum modules, shipping one free PDF deliverable. The writing
 brief is `../bizorca-weekly-post-brief.md` and the modules are
-`../bizorca-curriculum.md`; **read both before drafting.**
+`~/Dropbox/Business Coaching/EDC Curriculum/bizorca-curriculum.md`; **read both before drafting.**
 
 **Live as of 2026-09-03.** Migrations 011 and 012 are applied, the module map
 is imported (673 rows), and the format is verified end to end in production:
@@ -877,7 +877,7 @@ nothing per token — the same economics that already keep extraction off the
 API. The server path (`weekly` + `work`) stays for unattended runs.
 
 ```
-bizorca-drafts/weekly-mNN-<slug>.txt          write the post here
+~/Dropbox/Bizorca/Substack Posts/Weekly Posts/weekly-mNN-<slug>.txt          write the post here
 press/worker/.venv/bin/python press/worker/weekly_push.py <file> --check --proof
 press/worker/.venv/bin/python press/worker/weekly_push.py <file>
 ```
@@ -910,7 +910,7 @@ the HTML at handoff, exactly as for the server-composed drafts.
 with `status='done'` and `model='claude-code'` — no job, no model call — so
 `/compose/<id>`, promotion and the deliverable render are the same screens as
 before. `--check` validates without the server; `--proof` renders the PDF into
-`writer/mockups/` first; warnings (length outside 900–1,400, a
+`~/Dropbox/Bizorca/Substack Posts/Tool Downloads/` first; warnings (length outside 900–1,400, a
 `[shoutout: ___]` left in, an opener that reads as invented biography) block a
 push unless `--force`. A `weekly-` filename is invisible to `import_drafts`,
 which only matches the six daily format names, so nothing else picks it up.
@@ -927,7 +927,7 @@ Three things this path fixed or exposed:
   composer wrote #9's body as 0/1/2 out of 24; `--check` refuses a spec whose
   `max` is not items × 5.
 - **`composition:` in the front matter is the rewrite loop.** Pull a machine
-  draft into `bizorca-drafts/`, rewrite it, push it back into the same row
+  draft into `~/Dropbox/Bizorca/Substack Posts/Weekly Posts/`, rewrite it, push it back into the same row
   (and the promoted post, if there is one) rather than filing a second
   composition of the same post. `weekly-m01-money-baseline.txt` is the worked
   example: composition #9's body plus a hand-written twelve-item spec.

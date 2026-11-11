@@ -17,6 +17,7 @@ final class PostController
         $format = (string) ($_GET['format'] ?? '');
         $status = (string) ($_GET['status'] ?? '');
         $q      = trim((string) ($_GET['q'] ?? ''));
+        $module = (int) ($_GET['module'] ?? 0);
 
         $where = ['1'];
         $params = [];
@@ -28,6 +29,10 @@ final class PostController
             $where[] = 'p.status = ?';
             $params[] = $status;
         }
+        if ($module > 0) {
+            $where[] = 'p.module_id = ?';
+            $params[] = $module;
+        }
         if ($q !== '') {
             $where[] = '(p.title LIKE ? OR p.body LIKE ?)';
             $params[] = "%$q%";
@@ -37,7 +42,7 @@ final class PostController
 
         $posts = Database::all("
             SELECT p.id, p.number, p.slug, p.format, p.title, p.status, p.published_at,
-                   k.title AS kit_title,
+                   k.title AS kit_title, p.module_id,
                    EXISTS(SELECT 1 FROM af_triage t WHERE t.subject_type='post'
                             AND t.subject_id=p.id AND t.mark='write_about') AS queued
               FROM af_posts p LEFT JOIN af_kits k ON k.id = p.kit_id
@@ -48,7 +53,14 @@ final class PostController
         $statuses = Database::all(
             'SELECT status, COUNT(*) n FROM af_posts GROUP BY status');
 
-        View::render('posts', compact('posts', 'counts', 'statuses', 'format', 'status', 'q'),
+        // Every daily draft sits against one curriculum module (writer/substack-tools/daily-modules.tsv).
+        $modules = Database::all(
+            "SELECT m.id, m.title, COUNT(p.id) n FROM af_modules m
+          LEFT JOIN af_posts p ON p.module_id = m.id AND p.format <> 'weekly'
+           GROUP BY m.id, m.title ORDER BY m.id");
+
+        View::render('posts', compact('posts', 'counts', 'statuses', 'format', 'status', 'q',
+            'module', 'modules'),
             'Posts');
     }
 

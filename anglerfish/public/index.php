@@ -81,6 +81,7 @@ $router->get('/compose/{id}',      [ComposeController::class, 'show']);
 $router->get('/compose/{id}/status', [ComposeController::class, 'status']);
 $router->post('/compose/{id}/promote', [ComposeController::class, 'promote']);
 $router->get('/weekly',            [WeeklyController::class, 'index']);
+$router->get('/hypnologue',        [ComposeController::class, 'hypnologue']);
 $router->post('/weekly',           [WeeklyController::class, 'create']);
 $router->get('/videos',            [VideoController::class, 'index']);
 $router->get('/videos/{number}/script.txt', [VideoController::class, 'download']);
