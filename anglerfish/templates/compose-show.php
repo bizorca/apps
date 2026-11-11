@@ -81,6 +81,14 @@
              class="mt-2 inline-block rounded border border-navy px-3 py-1 text-xs text-navy hover:bg-cream">
             Preview the download &rarr;</a>
           <span class="text-[11px] text-muted">Opens a print-ready page; print or Save as PDF to check the page count.</span>
+          <?php $pdfId = \Anglerfish\Core\Database::value(
+              "SELECT id FROM af_assets WHERE subject_type='composition' AND subject_id=? AND target='weekly_deliverable' AND status='ready' ORDER BY id DESC LIMIT 1",
+              [(int) $c['id']]); ?>
+          <?php if ($pdfId): ?>
+            <a href="<?= url('/media/asset/' . (int) $pdfId) ?>" target="_blank"
+               class="mt-2 ml-2 inline-block rounded bg-navy px-3 py-1 text-xs text-cream hover:bg-navy2">Download the PDF &darr;</a>
+            <span class="text-[11px] text-muted">(rendered from this draft, without an issue number; promoting renders the numbered one)</span>
+          <?php endif; ?>
         <?php else: ?>
           <p class="mt-1 text-muted">No download content stored yet.</p>
         <?php endif; ?>

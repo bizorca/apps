@@ -179,6 +179,23 @@ final class WorkerController
             Api::json(['ok' => true, 'subject' => $post]);
         }
 
+        if ($type === 'composition') {
+            // A weekly draft, shaped like a post for handlers.deliverable_spec():
+            // no sequence number (that is assigned at promotion), so the PDF
+            // prints without "No. N" until the promoted post is rendered.
+            $c = Database::one(
+                'SELECT c.id, c.title, c.deliverable, c.deliverable_spec, c.module_id, c.created_at,
+                        m.title AS module_title, m.cohort
+                   FROM af_compositions c LEFT JOIN af_modules m ON m.id = c.module_id
+                  WHERE c.id = ?', [$id]);
+            if (!$c) {
+                Api::fail(404, 'No such composition.');
+            }
+            $c['deliverable_spec'] = json_decode((string) ($c['deliverable_spec'] ?? ''), true) ?: null;
+            $c['sequence_number'] = null;
+            Api::json(['ok' => true, 'subject' => $c]);
+        }
+
         Api::fail(400, "Unsupported subject_type '$type'.");
     }
 
