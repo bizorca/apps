@@ -60,6 +60,7 @@
       $jp = \Anglerfish\Core\Database::value(
           "SELECT payload FROM af_jobs WHERE type='compose' AND subject_type='composition'
              AND subject_id=? ORDER BY id DESC LIMIT 1", [(int) $c['id']]);
+      $origins = (array) (json_decode((string) $jp, true)['origins'] ?? []);
       foreach ((array) (json_decode((string) $jp, true)['source_refs'] ?? []) as $r) {
           $sub = \Anglerfish\Models\Composition::subject((string) $r['subject_type'], (int) $r['subject_id']);
           if ($sub) {
@@ -76,6 +77,10 @@
           <ul class="mt-1 list-disc pl-5 text-xs text-muted">
             <?php foreach (($dspec['sections'] ?? []) as $sec): ?><li><?= h($sec['title'] ?? '') ?></li><?php endforeach; ?>
           </ul>
+          <a href="<?= url('/compose/' . (int) $c['id'] . '/download') ?>" target="_blank"
+             class="mt-2 inline-block rounded border border-navy px-3 py-1 text-xs text-navy hover:bg-cream">
+            Preview the download &rarr;</a>
+          <span class="text-[11px] text-muted">Opens a print-ready page; print or Save as PDF to check the page count.</span>
         <?php else: ?>
           <p class="mt-1 text-muted">No download content stored yet.</p>
         <?php endif; ?>
@@ -94,9 +99,17 @@
           <span class="text-muted">(the post stays as it is)</span>
         </form>
         <?php if ($refs): ?>
-          <p class="mt-3 text-[11px] font-bold uppercase tracking-[2px] text-gold">Sources used</p>
+          <p class="mt-3 text-[11px] font-bold uppercase tracking-[2px] text-gold">Big Ideas it drew on</p>
           <ul class="mt-1 list-disc pl-5 text-xs text-muted">
             <?php foreach ($refs as $r): ?><li><?= h($r) ?></li><?php endforeach; ?>
+          </ul>
+        <?php endif; ?>
+        <?php if ($origins): ?>
+          <p class="mt-3 text-[11px] font-bold uppercase tracking-[2px] text-gold">Original sources behind them</p>
+          <ul class="mt-1 list-disc pl-5 text-xs text-muted">
+            <?php foreach ($origins as $o): ?>
+              <li><span class="text-navy"><?= h($o['author'] ?? '') ?></span> &middot; <?= h(basename((string) ($o['path'] ?? ''))) ?></li>
+            <?php endforeach; ?>
           </ul>
         <?php endif; ?>
       </div>

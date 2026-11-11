@@ -133,6 +133,34 @@ final class ComposeController
         Api::json($c ? ['ok' => true] + $c : ['ok' => false], $c ? 200 : 404);
     }
 
+    /** GET /compose/{id}/download — the download as a print-ready preview page. */
+    public function download(string $id): void
+    {
+        $c = Database::one('SELECT * FROM af_compositions WHERE id = ?', [(int) $id]);
+        $spec = $c ? json_decode((string) ($c['deliverable_spec'] ?? ''), true) : null;
+        if (!is_array($spec)) {
+            http_response_code(404);
+            echo 'No download content for this composition yet.';
+            return;
+        }
+        $module = !empty($c['module_id']) ? \Anglerfish\Models\Weekly::module((int) $c['module_id']) : null;
+        $post = !empty($c['post_id'])
+            ? Database::one('SELECT sequence_number, substack_url, published_at FROM af_posts WHERE id = ?', [(int) $c['post_id']])
+            : null;
+        $spec += [
+            'container'     => $c['deliverable'],
+            'module_number' => $module ? (int) $module['id'] : null,
+            'module_title'  => $module['title'] ?? '',
+            'cohort'        => $module['cohort'] ?? 'foundations',
+            'sequence'      => $post['sequence_number'] ?? null,
+            'post_url'      => !empty($post['substack_url']) ? preg_replace('#^https?://#', '', $post['substack_url']) : 'bizorca.com',
+            'date'          => date('F Y', strtotime((string) ($post['published_at'] ?? $c['created_at'] ?? 'now'))),
+        ];
+        header('Content-Type: text/html; charset=utf-8');
+        header('X-Robots-Tag: noindex, nofollow');
+        echo \Anglerfish\Services\DeliverableHtml::page($spec);
+    }
+
     /** POST /compose/{id}/deliverable — rewrite only the download, in another container. */
     public function redeliver(string $id): void
     {

@@ -222,7 +222,9 @@ final class Composition
         $origins = [];
         foreach (array_filter(array_merge([$subject], $extra)) as $subj) {
             foreach (self::originsFor($subj) as $o) {
-                $origins[$o['path']] = $o;
+                // The index holds some files twice under two names; key on the
+                // summary so the composer doesn't read the same source twice.
+                $origins[md5(mb_substr($o['summary'], 0, 300))] = $o;
             }
         }
         $origins = array_slice(array_values($origins), 0, 10);
