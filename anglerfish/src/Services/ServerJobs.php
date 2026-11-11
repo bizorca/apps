@@ -135,6 +135,18 @@ final class ServerJobs
         $specError = null;
         if (($p['format'] ?? '') === 'weekly' && !empty($p['deliverable'])) {
             $checked = Deliverable::check($parsed['deliverable_spec'], (string) $p['deliverable']);
+            // The first pass tends to write long. One focused trim call, given
+            // only the download and the limits, brings it inside two pages; the
+            // trimmed version is kept only if it passes the check cleanly.
+            if ($provider === 'anthropic' && $checked['spec'] !== null && $checked['warnings']) {
+                $trimmed = self::trimDeliverable($checked['spec'], $p);
+                if ($trimmed !== null) {
+                    $again = Deliverable::check($trimmed, (string) $p['deliverable']);
+                    if ($again['spec'] !== null && !$again['warnings']) {
+                        $checked = $again;
+                    }
+                }
+            }
             $spec = $checked['spec'];
             $specError = $checked['errors']
                 ? 'Download not stored: ' . implode('; ', $checked['errors'])
@@ -150,6 +162,36 @@ final class ServerJobs
             'deliverable_spec' => $spec,
             'spec_error'       => $specError,
         ];
+    }
+
+    /**
+     * Shorten a weekly download that would run past two pages. Sends only the
+     * JSON and the limits, so it costs a fraction of the compose call.
+     *
+     * @param  array<string,mixed> $spec
+     * @return ?array<string,mixed>
+     */
+    private static function trimDeliverable(array $spec, array $p): ?array
+    {
+        $system = "You shorten printable worksheets for Bizorca Press. The input is the JSON for "
+            . "a two-page PDF download that currently runs to three. Return the same JSON shape, "
+            . "same container, shorter: at most five sections, at most ten fields, every field "
+            . "one line unless it holds a script, at most sixteen fill-in lines in total, hints "
+            . "and notes one short line each, long text replaced by a fill-in version with blanks. "
+            . "Keep the section that names the belief or behavior pattern (the psychology), keep "
+            . "the commitment, keep it usable by any practice (a counselor as much as a tax pro), "
+            . "and for a test keep exactly the scored items with scoring.max equal to items times "
+            . "five. Return only the JSON object, nothing else.";
+        try {
+            $res = Anthropic::complete($system,
+                json_encode($spec, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                $p['model'] ?? null, 'medium');
+        } catch (\Throwable) {
+            return null;
+        }
+        $json = preg_replace('/^```(?:json)?\s*|\s*```$/', '', trim($res['text']));
+        $out = json_decode((string) $json, true);
+        return is_array($out) ? $out : null;
     }
 
     private static function generateImage(array $p): array
