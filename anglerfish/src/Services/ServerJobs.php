@@ -144,7 +144,26 @@ final class ServerJobs
                 $chosen = (string) ($parsed['deliverable_spec']['container'] ?? '');
                 $container = isset(\Anglerfish\Models\Weekly::CONTAINERS[$chosen]) ? $chosen : 'test';
             }
-            $checked = Deliverable::check($parsed['deliverable_spec'], $container);
+            // The composer occasionally stops before the download. Write it in a
+            // second call rather than leave the post without one: in the
+            // container the post itself names, else one that differs from last
+            // week's.
+            if ($parsed['deliverable_spec'] === null && $provider === 'anthropic') {
+                if (($p['deliverable'] ?? '') === '') {
+                    $named = '';
+                    if (preg_match('/download is an? (test|assessment|checklist|worksheet|role document|position contract)/i', $parsed['body'], $mm)) {
+                        $named = ['assessment' => 'test', 'role document' => 'role_document',
+                                  'position contract' => 'role_document'][strtolower($mm[1])] ?? strtolower($mm[1]);
+                    }
+                    $last = (string) ($p['last_container'] ?? '');
+                    $container = isset(\Anglerfish\Models\Weekly::CONTAINERS[$named]) ? $named
+                        : ($last === 'test' ? 'worksheet' : 'test');
+                }
+                $checked = self::writeDeliverable($parsed['title'], $parsed['body'], $container,
+                    (string) ($p['voice_preset'] ?? 'bizorca_press'), $p);
+            } else {
+                $checked = Deliverable::check($parsed['deliverable_spec'], $container);
+            }
             // The first pass tends to write long. One focused trim call, given
             // only the download and the limits, brings it inside two pages; the
             // trimmed version is kept only if it passes the check cleanly.
@@ -187,13 +206,35 @@ final class ServerJobs
             throw new \RuntimeException('Composition not found.');
         }
         $container = (string) $p['container'];
-        $user = "# Rewrite the download only\n\nThis weekly post is finished. Write its download "
-            . "again as a **" . str_replace('_', ' ', $container) . "**, following the download "
+        $checked = self::writeDeliverable((string) $c['title'], (string) $c['body'], $container,
+            (string) ($c['voice_preset'] ?: 'bizorca_press'), $p);
+        if ($checked['spec'] === null) {
+            throw new \RuntimeException('Download not usable: ' . implode('; ', $checked['errors']));
+        }
+        return [
+            'composition_id' => (int) $c['id'],
+            'container'      => $container,
+            'spec'           => $checked['spec'],
+            'note'           => $checked['warnings'] ? 'Download check: ' . implode('; ', $checked['warnings']) : null,
+        ];
+    }
+
+    /**
+     * Write a weekly post's download in a given container, from the finished
+     * post: one call on the same cached system prompt, then the check, then a
+     * trim pass if it would run long.
+     *
+     * @return array{spec:?array<string,mixed>,errors:list<string>,warnings:list<string>}
+     */
+    private static function writeDeliverable(string $title, string $body, string $container, string $voice, array $p): array
+    {
+        $user = "# Write the download only\n\nThis weekly post is finished. Write its download "
+            . "as a **" . str_replace('_', ' ', $container) . "**, following the download "
             . "rules and that container's shape in the weekly format: practice-agnostic, the "
             . "psychology inside, two printed pages at most, the post's own number, steps, "
             . "words and commitment.\n\nReturn only the JSON object, with \"container\": \""
-            . $container . "\". Nothing else.\n\n## The post\n\n" . $c['title'] . "\n\n" . $c['body'];
-        $res = Anthropic::complete(Compose::system(['voice_preset' => $c['voice_preset'] ?: 'bizorca_press']),
+            . $container . "\". Nothing else.\n\n## The post\n\n" . $title . "\n\n" . $body;
+        $res = Anthropic::complete(Compose::system(['voice_preset' => $voice]),
             $user, $p['model'] ?? null, $p['effort'] ?? null);
         $json = preg_replace('/^```(?:json)?\s*|\s*```$/', '', trim($res['text']));
         $checked = Deliverable::check(json_decode((string) $json, true), $container);
@@ -204,15 +245,7 @@ final class ServerJobs
                 $checked = $again;
             }
         }
-        if ($checked['spec'] === null) {
-            throw new \RuntimeException('Download not usable: ' . implode('; ', $checked['errors']));
-        }
-        return [
-            'composition_id' => (int) $c['id'],
-            'container'      => $container,
-            'spec'           => $checked['spec'],
-            'note'           => $checked['warnings'] ? 'Download check: ' . implode('; ', $checked['warnings']) : null,
-        ];
+        return $checked;
     }
 
     private static function applyRedeliver(array $d): void

@@ -17,8 +17,12 @@ use GuzzleHttp\Client as Guzzle;
  */
 final class Anthropic
 {
-    /** Leaves room for adaptive thinking plus the post itself. */
-    private const MAX_TOKENS = 16000;
+    /**
+     * Leaves room for adaptive thinking plus the post itself and its download.
+     * 16000 ran out on composition 27 (2026-11-11): thinking at high effort plus
+     * a 1,500-word post used it up before the download JSON was written.
+     */
+    private const MAX_TOKENS = 32000;
 
     /**
      * Hard ceiling per attempt.
