@@ -23,12 +23,12 @@ final class Deliverable
     private const KEYS = ['container', 'title', 'intro', 'sections', 'scoring'];
 
     /**
-     * @return array{spec:?array<string,mixed>,errors:list<string>}
+     * @return array{spec:?array<string,mixed>,errors:list<string>,warnings:list<string>}
      */
     public static function check(?array $spec, string $container): array
     {
         if ($spec === null) {
-            return ['spec' => null, 'errors' => ['no download content after the body']];
+            return ['spec' => null, 'errors' => ['no download content after the body'], 'warnings' => []];
         }
 
         $errors = [];
@@ -37,7 +37,7 @@ final class Deliverable
 
         $sections = $spec['sections'] ?? null;
         if (!is_array($sections) || $sections === []) {
-            return ['spec' => null, 'errors' => ['the download needs a non-empty "sections" list']];
+            return ['spec' => null, 'errors' => ['the download needs a non-empty "sections" list'], 'warnings' => []];
         }
 
         $items = $fields = 0;
@@ -86,7 +86,42 @@ final class Deliverable
             $errors[] = "a $container needs items, fields or write_lines";
         }
 
-        return ['spec' => $errors ? null : $spec, 'errors' => $errors];
+        $warnings = [];
+        if (!$errors && ($size = self::size($spec)) > self::TWO_PAGES) {
+            $warnings[] = "likely runs past two pages (size $size, aim under " . self::TWO_PAGES
+                . '); trim fields or sections before promoting';
+        }
+
+        return ['spec' => $errors ? null : $spec, 'errors' => $errors, 'warnings' => $warnings];
+    }
+
+    /**
+     * Rough printed size, in body-line units. Calibrated 2026-11-11 against two
+     * real renders: a twelve-item test with a nine-field sheet (two pages)
+     * scored 76; a seven-section worksheet (four pages) scored 141. Only the
+     * Mac renderer knows the true page count, so this is a warning, not a gate.
+     */
+    private const TWO_PAGES = 95;
+
+    /** @param array<string,mixed> $spec */
+    private static function size(array $spec): int
+    {
+        $len = static fn($v) => mb_strlen((string) $v);
+        $u = $len($spec['intro'] ?? '') / 95 + 2;
+        foreach ($spec['sections'] as $s) {
+            $u += 2.5 + $len($s['instruction'] ?? '') / 95;
+            foreach ((array) ($s['items'] ?? []) as $it) {
+                $u += max(1, ceil($len($it['text'] ?? '') / 80)) + $len($it['note'] ?? '') / 95;
+            }
+            foreach ((array) ($s['fields'] ?? []) as $f) {
+                $u += 1.2 + (int) ($f['lines'] ?? 1) * 1.6 + $len($f['hint'] ?? '') / 95;
+            }
+            $u += (int) ($s['write_lines'] ?? 0) * 1.6;
+        }
+        if (!empty($spec['scoring']['bands'])) {
+            $u += 4 + count($spec['scoring']['bands']) * 2.5;
+        }
+        return (int) round($u);
     }
 
     /** @param list<mixed> $sections */

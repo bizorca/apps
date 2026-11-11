@@ -110,7 +110,14 @@ container:
   only logistics is wrong.
 - **It is the working copy of the post,** not new material: the post's number, questions,
   steps, scripts and commitment, formatted to fill in with a pen.
-- Plain text inside the JSON: no markdown, no emoji. Keep it to two printed pages.
+- Plain text inside the JSON: no markdown, no emoji.
+- **Two printed pages, hard limit.** That holds about a twelve-item test plus a
+  nine-field sheet. Limits per container: a test has its twelve items and at most nine
+  fields; a checklist at most fourteen items in at most four sections; a worksheet at most
+  five sections and twelve fields (or eight `write_lines`) in total; a role document at
+  most sixteen fields. Hints and notes are one short line. Long text (a letter paragraph,
+  a script) belongs in the post; the download gets the fill-in version with blanks.
+  When in doubt, cut a section.
 
 Shared shape: `{"container": "<container>", "title": "...", "intro": "...", "sections":
 [...]}`. A section has a `title`, an optional `instruction`, and then `items` (a list of

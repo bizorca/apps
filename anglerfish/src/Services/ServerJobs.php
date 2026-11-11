@@ -136,7 +136,9 @@ final class ServerJobs
         if (($p['format'] ?? '') === 'weekly' && !empty($p['deliverable'])) {
             $checked = Deliverable::check($parsed['deliverable_spec'], (string) $p['deliverable']);
             $spec = $checked['spec'];
-            $specError = $checked['errors'] ? 'Download not stored: ' . implode('; ', $checked['errors']) : null;
+            $specError = $checked['errors']
+                ? 'Download not stored: ' . implode('; ', $checked['errors'])
+                : ($checked['warnings'] ? 'Download check: ' . implode('; ', $checked['warnings']) : null);
         }
 
         return [
