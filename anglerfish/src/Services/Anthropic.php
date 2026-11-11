@@ -43,7 +43,7 @@ final class Anthropic
     public static function model(): string
     {
         $cfg = require dirname(__DIR__, 2) . '/config/app.php';
-        return (string) ($cfg['anthropic']['model'] ?? 'claude-opus-5');
+        return (string) ($cfg['anthropic']['model'] ?? 'claude-opus-5-5');
     }
 
     /**
@@ -55,7 +55,7 @@ final class Anthropic
      * one later for Opus does not silently break Hypnologue, which composes on
      * Fable 5.1.
      */
-    private const THINKING_ALWAYS_ON = ['claude-fable-5-1', 'claude-fable-5'];
+    private const THINKING_ALWAYS_ON = ['claude-opus-5-5', 'claude-fable-5-1', 'claude-fable-5'];
 
     public static function thinkingAlwaysOn(string $model): bool
     {
@@ -66,11 +66,9 @@ final class Anthropic
      * Assemble output_config for a call.
      *
      * `effort` is a publication's decision (Publication::effort) and controls
-     * how much thinking the model does before answering. Sending nothing means
-     * the API's own default of `high`, which is what every existing Bizorca
-     * compose has always got — so an absent effort must produce an absent key
-     * rather than an explicit 'high', or every cached prefix changes for no
-     * reason.
+     * how much thinking the model does before answering. With none chosen this
+     * sends `high`, which is what every Bizorca compose got on Opus 5 by
+     * default; Opus 5.5's own default is medium.
      *
      * @param  array<string,mixed> $extra
      * @return array<string,mixed>
@@ -80,6 +78,11 @@ final class Anthropic
         $cfg = $extra;
         if ($effort !== null && in_array($effort, ['low', 'medium', 'high', 'xhigh', 'max'], true)) {
             $cfg['effort'] = $effort;
+        } else {
+            // Opus 5.5 defaults to medium where Opus 5 defaulted to high, so
+            // "no effort chosen" has to say high out loud to keep what every
+            // compose and art direction got before the switch (2026-11-11).
+            $cfg['effort'] = 'high';
         }
         return $cfg;
     }

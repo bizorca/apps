@@ -30,7 +30,7 @@ return [
     // should cost a cap rather than an open tab.
     'anthropic' => [
         'key'   => (string) tl_env('AF_ANTHROPIC_API_KEY', ''),
-        'model' => (string) tl_env('AF_ANTHROPIC_MODEL', 'claude-opus-5'),
+        'model' => (string) tl_env('AF_ANTHROPIC_MODEL', 'claude-opus-5-5'),
     ],
 
     // Images only — Claude does not generate images. Same budget-cap reasoning.

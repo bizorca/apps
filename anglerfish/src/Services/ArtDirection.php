@@ -24,11 +24,11 @@ namespace Anglerfish\Services;
 final class ArtDirection
 {
     /**
-     * Opus 5 — the app-wide composer model, pinned here too so the direction
+     * Opus 5.5 — the app-wide composer model, pinned here too so the direction
      * and the post it accompanies are written by the same reader. Override per
      * call if that changes.
      */
-    public const MODEL = 'claude-opus-5';
+    public const MODEL = 'claude-opus-5-5';
 
     /** Enforced at the API, because a missing field is a broken render. */
     private const SCHEMA = [

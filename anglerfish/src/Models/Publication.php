@@ -115,7 +115,7 @@ final class Publication
         return $m === '' ? null : $m;
     }
 
-    /** output_config.effort, or null to send none (the API reads that as high). */
+    /** output_config.effort, or null for the app default (Anthropic::outputConfig sends high). */
     public static function effort(array $pub): ?string
     {
         $e = trim((string) ($pub['effort'] ?? ''));
