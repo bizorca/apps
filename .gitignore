@@ -2,3 +2,4 @@
 # Server-only secrets and runtime data. private_html/ is otherwise code.
 private_html/.env.php
 private_html/data/
+.gstack/
