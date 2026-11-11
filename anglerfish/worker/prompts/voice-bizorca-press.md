@@ -100,6 +100,9 @@ investment, securities, tax or legal advice.
 - No tool plugs (TaxCRM, Kokoro, Proforma), no "post it in the comments" asks, no "Mosey
   along" or "Dude, stop reading" goading, no `[shoutout]` placeholders. He cut all of these
   from his own drafts.
+- Never tell tax pros to hold a finished return or a client's records until they pay.
+  Their duty to return client records (Circular 230 section 10.28) makes that risky
+  advice. Tie payment to the deposit and to a card on file charged at delivery instead.
 - Never link or name a paid booking page (The Sounding, Money Clarity, The Steady Ledger's
   booking link). Invitations go to Behind the Books (financialhypnosis.com/biz), the free first
   conversation, or a program's information page on financialhypnosis.com.

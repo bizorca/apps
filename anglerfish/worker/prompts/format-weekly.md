@@ -114,8 +114,9 @@ container:
 - **Two printed pages, hard limit.** That holds about a twelve-item test plus a
   nine-field sheet. Limits per container: a test has its twelve items and at most nine
   fields; a checklist at most fourteen items in at most four sections; a worksheet at most
-  five sections and twelve fields (or eight `write_lines`) in total; a role document at
-  most sixteen fields. Hints and notes are one short line. Long text (a letter paragraph,
+  five sections and ten fields (or eight `write_lines`) in total; a role document at
+  most fourteen fields. Fields are one line unless they hold a script, and the whole
+  download has at most sixteen fill-in lines. Hints and notes are one short line. Long text (a letter paragraph,
   a script) belongs in the post; the download gets the fill-in version with blanks.
   When in doubt, cut a section.
 

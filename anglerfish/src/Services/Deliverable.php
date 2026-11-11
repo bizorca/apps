@@ -97,8 +97,9 @@ final class Deliverable
 
     /**
      * Rough printed size, in body-line units. Calibrated 2026-11-11 against two
-     * real renders: a twelve-item test with a nine-field sheet (two pages)
-     * scored 76; a seven-section worksheet (four pages) scored 141. Only the
+     * real renders, reweighted after a third: a twelve-item test with a
+     * nine-field sheet (two pages) scores 85; a five-section worksheet with
+     * twelve mostly two-line fields (three pages) scores 109. Only the
      * Mac renderer knows the true page count, so this is a warning, not a gate.
      */
     private const TWO_PAGES = 95;
@@ -114,7 +115,7 @@ final class Deliverable
                 $u += max(1, ceil($len($it['text'] ?? '') / 80)) + $len($it['note'] ?? '') / 95;
             }
             foreach ((array) ($s['fields'] ?? []) as $f) {
-                $u += 1.2 + (int) ($f['lines'] ?? 1) * 1.6 + $len($f['hint'] ?? '') / 95;
+                $u += 1.5 + (int) ($f['lines'] ?? 1) * 2.2 + $len($f['hint'] ?? '') / 95;
             }
             $u += (int) ($s['write_lines'] ?? 0) * 1.6;
         }
