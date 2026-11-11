@@ -55,7 +55,7 @@ $pdo = \Anglerfish\Core\Database::pdo();
 // 'mb'. A 'dk' record is still accepted, as it is everywhere else in the app,
 // and resolves to 'mb' — so it can neither label a book with a brain that no
 // longer exists nor recreate the deleted big-ideas-dk-* books.
-$BRAIN = ['mb' => 'Marketing Brain'];
+$BRAIN = ['mb' => 'Marketing Brain', 'hb' => 'Hypnosis Brain', 'pf' => 'Personal Finance Brain'];
 $books = $sections = $skipped = 0;
 
 foreach ($data as $rec) {
