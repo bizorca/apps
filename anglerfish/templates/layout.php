@@ -173,7 +173,7 @@ document.addEventListener('alpine:init', () => {
         ],
         'Bizorca' => [
           ['Weekly posts', '/weekly', ''],
-          ['Daily drafts', '/posts', ''],
+          ['Post Drafts', '/posts', ''],
           ['Compose', '/compose', ''],
           ['Vault', '/kits', ''],
           ['Marketing Brain', '/corpus', ''],
