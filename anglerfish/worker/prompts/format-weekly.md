@@ -95,3 +95,51 @@ Numbered, sequential, literal. A procedure the reader can run this week.
 - The post becoming pure psychology. Every post ends with the reader holding a procedure.
 - The download or protocol only working for tax pros. A massage therapist must be able to
   use every line.
+
+## The download
+
+Every weekly post ships with a two-page PDF. Write its content after the body, as JSON,
+in the container the operator picked (named in the user turn). Rules for every
+container:
+
+- **Practice-agnostic.** A counselor, an energy healer and a tax pro must each be able to
+  work every line. Say "client," "session," "fee," "the busy season." Tax specifics go in
+  a `hint`, never in an item or label.
+- **The psychology is inside the download too.** Every container carries the belief or
+  behavior pattern the post names, as described per container below. A download that is
+  only logistics is wrong.
+- **It is the working copy of the post,** not new material: the post's number, questions,
+  steps, scripts and commitment, formatted to fill in with a pen.
+- Plain text inside the JSON: no markdown, no emoji. Keep it to two printed pages.
+
+Shared shape: `{"container": "<container>", "title": "...", "intro": "...", "sections":
+[...]}`. A section has a `title`, an optional `instruction`, and then `items` (a list of
+`{"text": "...", "note": "..."}`, note optional), `fields` (a list of `{"label": "...",
+"hint": "...", "lines": 1-3}`), and/or `write_lines` (a number of blank lines).
+
+**test** — a scored self-assessment. Three sections of four `items` each, every item a
+statement the reader scores 1 (not true at all) to 5 (completely true), written so a
+higher score means a bigger leak. The third section scores the belief and the behavior
+("How you say it," "What you avoid"), and carries a `note`: "If any one section totals 16
+or more, that section is your project this month, whatever your total." Then a fourth
+section of `fields`: the post's number, each protocol step, the script, and the
+commitment. Add `"scoring": {"max": 60, "bands": [{"range": "12 to 27", "meaning":
+"...", "action": "..."}, {"range": "28 to 43", ...}, {"range": "44 to 60", ...}]}`. The
+max must equal the scored items times five.
+
+**checklist** — a sequence done repeatedly. Two to four sections of `items`, each item one
+action, in order, with a `note` where a step needs a reason. One item names the sentence
+the reader will hear in their head at the hard step and their answer to it, and the last
+section is the commitment: the date, the person told, and when the next run is on the
+calendar.
+
+**worksheet** — a decision written down. Four to seven sections, each a prompt with
+`write_lines` or `fields`, in the order the post works through it. One section is the
+psychology: fields for "The sentence in my head," "What's true about it," and "My
+business answer." Finish with the exact words (script or notice) and the commitment.
+
+**role_document** — a position contract for something being handed off. Sections of
+`fields`: the role (name, reports to, hours, one-line purpose), three to four
+accountabilities ("Owns"), three results with how each is measured, "What I stop doing"
+(`write_lines`), "What I'm afraid happens if I hand this off" with the check that would
+settle it, and signatures.

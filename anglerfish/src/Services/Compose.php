@@ -81,6 +81,10 @@ final class Compose
             . "The body is plain text: blank line between paragraphs, `- ` for bullets, "
             . "`1. ` for numbered lists. No heading over the closing section, no "
             . "markdown headings, no HTML.\n\n"
+            . "For a weekly post only, after the body add a line reading exactly "
+            . "`---DELIVERABLE---` and then the download content as one JSON object, in "
+            . "the shape the weekly format gives for the requested container. Nothing "
+            . "after the JSON.\n\n"
             . "Hit the requested length. Do not pad to reach it and do not run past "
             . "it — a post that says the thing in fewer words is finished, not short. "
             . "No preamble, no commentary on your own draft, no alternatives.",
@@ -128,7 +132,9 @@ final class Compose
                 . "write it out in full in the post body — the PDF is the working copy of "
                 . "what the reader just read, never the continuation of it. Anything that "
                 . "renders as a list appears in both places. Mention the download once, "
-                . "plainly, in the close.";
+                . "plainly, in the close, and describe it as what it is (a "
+                . str_replace('_', ' ', (string) $p['deliverable']) . "). Write its content "
+                . "after the body, as the output section says.";
         }
 
         $angle = trim((string) ($p['angle'] ?? ''));
@@ -250,6 +256,17 @@ final class Compose
         if (preg_match('/^\s*SUBTITLE:\s*(.+)$/mi', $text, $m)) {
             $subtitle = trim($m[1]);
         }
+        // The weekly download rides after the body (see system()). Split it off
+        // first so it never leaks into the post, and leave it null when absent.
+        $spec = null;
+        if (($at = strpos($text, Deliverable::DELIM)) !== false) {
+            $json = trim(substr($text, $at + strlen(Deliverable::DELIM)));
+            $json = preg_replace('/^```(?:json)?\s*|\s*```$/', '', $json);
+            $decoded = json_decode((string) $json, true);
+            $spec = is_array($decoded) ? $decoded : null;
+            $text = substr($text, 0, $at);
+        }
+
         if (preg_match('/^\s*BODY:\s*$(.*)/msi', $text, $m)) {
             $body = trim($m[1]);
         }
@@ -268,7 +285,8 @@ final class Compose
             $title = mb_substr(trim($lines[0] ?? 'Untitled'), 0, 500);
         }
 
-        return ['title' => mb_substr($title, 0, 500),
+        return ['deliverable_spec' => $spec,
+                'title' => mb_substr($title, 0, 500),
                 'subtitle' => mb_substr($subtitle, 0, 500),
                 'body' => $body];
     }

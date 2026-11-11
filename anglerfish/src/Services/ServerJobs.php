@@ -128,12 +128,25 @@ final class ServerJobs
 
         $parsed = Compose::parse($text);
 
+        // A weekly post now carries its own download. Checked here with the
+        // same rules weekly_push.py applies; a spec that fails is not stored,
+        // and the reason is recorded on the composition instead.
+        $spec = null;
+        $specError = null;
+        if (($p['format'] ?? '') === 'weekly' && !empty($p['deliverable'])) {
+            $checked = Deliverable::check($parsed['deliverable_spec'], (string) $p['deliverable']);
+            $spec = $checked['spec'];
+            $specError = $checked['errors'] ? 'Download not stored: ' . implode('; ', $checked['errors']) : null;
+        }
+
         return [
-            'composition_id' => (int) $p['composition_id'],
-            'model'          => $model,
-            'title'          => $parsed['title'],
-            'subtitle'       => $parsed['subtitle'],
-            'body'           => $parsed['body'],
+            'composition_id'   => (int) $p['composition_id'],
+            'model'            => $model,
+            'title'            => $parsed['title'],
+            'subtitle'         => $parsed['subtitle'],
+            'body'             => $parsed['body'],
+            'deliverable_spec' => $spec,
+            'spec_error'       => $specError,
         ];
     }
 
@@ -563,9 +576,14 @@ final class ServerJobs
     {
         Database::run(
             "UPDATE af_compositions
-                SET status='done', title=?, subtitle=?, body=?, model=?, finished_at=NOW()
+                SET status='done', title=?, subtitle=?, body=?, model=?, finished_at=NOW(),
+                    deliverable_spec = COALESCE(?, deliverable_spec), error = ?
               WHERE id=?",
-            [$d['title'], $d['subtitle'], $d['body'], $d['model'], (int) $d['composition_id']]
+            [$d['title'], $d['subtitle'], $d['body'], $d['model'],
+             !empty($d['deliverable_spec'])
+                 ? json_encode($d['deliverable_spec'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+                 : null,
+             $d['spec_error'] ?? null, (int) $d['composition_id']]
         );
     }
 
