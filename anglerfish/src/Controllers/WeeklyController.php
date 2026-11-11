@@ -70,35 +70,29 @@ final class WeeklyController
             redirect('/weekly');
         }
 
-        $deliverable = (string) ($_POST['deliverable'] ?? '');
-        if (!isset(Weekly::CONTAINERS[$deliverable])) {
-            flash('error', 'Pick one of the four deliverable containers.');
-            redirect('/weekly?module=' . $moduleId);
-        }
-
-        $type    = (string) ($_POST['subject_type'] ?? 'freeform');
-        $id      = (int) ($_POST['subject_id'] ?? 0);
-        $subject = $id ? Composition::subject($type, $id) : null;
-
-        $audience = (string) ($_POST['audience'] ?? 'practitioners');
-        if (!isset(Composition::AUDIENCES[$audience])) {
-            $audience = 'practitioners';
-        }
+        // Runs the way a post gets written in Claude Code: sources chosen from
+        // the library mapped to the module, supporting detail always pulled, the
+        // topic and the download container left to the composer. The operator
+        // picks the module and can change the container afterwards on the draft.
+        $sources = Weekly::autoSources($moduleId);
+        $first   = $sources[0] ?? null;
+        $subject = $first ? Composition::subject($first['subject_type'], $first['subject_id']) : null;
 
         $compId = Composition::create([
-            'subject_type' => $subject ? $type : 'freeform',
-            'subject_id'   => $subject ? $id : 0,
+            'subject_type' => $subject ? $first['subject_type'] : 'freeform',
+            'subject_id'   => $subject ? $first['subject_id'] : 0,
+            'sources'      => array_slice($sources, 1),
             'format'       => 'weekly',
             'module_id'    => $moduleId,
-            'deliverable'  => $deliverable,
-            'angle'        => trim((string) ($_POST['angle'] ?? '')),
-            'audience'     => $audience,
+            'deliverable'  => null,
+            'angle'        => '',
+            'audience'     => 'practitioners',
             // Stored for the column's sake; Compose overrides it for weekly,
             // which has one working band of its own.
             'length'       => 'long',
             'voice_preset' => 'bizorca_press',
             'extra'        => trim((string) ($_POST['extra'] ?? '')),
-            'expand'       => !empty($_POST['expand']),
+            'expand'       => true,
         ], $subject);
 
         redirect('/compose/' . $compId);

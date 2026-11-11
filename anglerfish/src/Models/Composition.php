@@ -203,6 +203,34 @@ final class Composition
              $in['audience'], $in['length'], $voice, $in['extra']]
         );
 
+        // Extra sources (weekly auto-selection) and the supporting passages
+        // pulled for every source, de-duplicated and capped.
+        $extra = [];
+        $refs = [];
+        foreach ((array) ($in['sources'] ?? []) as $r) {
+            $subj = self::subject((string) $r['subject_type'], (int) $r['subject_id']);
+            if ($subj) {
+                $extra[] = $subj;
+                $refs[] = ['subject_type' => (string) $r['subject_type'], 'subject_id' => (int) $r['subject_id']];
+            }
+        }
+        if ($subject) {
+            $refs = array_merge([['subject_type' => $in['subject_type'], 'subject_id' => (int) $in['subject_id']]], $refs);
+        }
+        $support = [];
+        if (!empty($in['expand'])) {
+            $seenPassage = [];
+            foreach (array_filter(array_merge([$subject], $extra)) as $subj) {
+                foreach (\Anglerfish\Services\Expand::fromLibrary($subj, self::bookIdOf($subj)) as $sup) {
+                    $k = md5($sup['source'] . mb_substr($sup['text'], 0, 120));
+                    if (!isset($seenPassage[$k]) && count($support) < 12) {
+                        $seenPassage[$k] = true;
+                        $support[] = $sup;
+                    }
+                }
+            }
+        }
+
         // The source travels in the payload so the runner needs no extra lookup.
         Job::enqueue('compose', 'composition', $id, [
             'composition_id' => $id,
@@ -235,11 +263,26 @@ final class Composition
             ] : null,
             'deliverable'    => $deliverable,
             'source'         => self::sourceForPrompt($subject),
+            // A weekly post is written from several sources at once, chosen by
+            // Weekly::autoSources(). The first is also `source` above, so older
+            // readers of the payload still work.
+            'sources'        => array_values(array_filter(array_map(
+                static fn($x) => self::sourceForPrompt($x), $extra))),
+            'source_refs'    => $refs,
             // Retrieved at enqueue time, not at run time, so the payload is a
-            // complete record of what the model was actually shown.
-            'support'        => !empty($in['expand']) && $subject
-                ? \Anglerfish\Services\Expand::fromLibrary($subject, self::bookIdOf($subject))
-                : [],
+            // complete record of what the model was actually shown. Weekly
+            // posts always get it, across every source.
+            'support'        => $support,
+            // Weekly context the composer needs to choose a topic and a
+            // container without being told: today's date (the tax calendar),
+            // the last few titles (no repeats), the last container (vary it).
+            'today'          => $in['format'] === 'weekly' ? date('l, F j, Y') : null,
+            'recent_titles'  => $in['format'] === 'weekly' ? array_column(Database::all(
+                "SELECT title FROM af_compositions WHERE format = 'weekly' AND title IS NOT NULL
+                  AND id <> ? ORDER BY id DESC LIMIT 8", [$id]), 'title') : [],
+            'last_container' => $in['format'] === 'weekly' ? Database::value(
+                "SELECT deliverable FROM af_compositions WHERE format = 'weekly'
+                  AND deliverable IS NOT NULL AND id <> ? ORDER BY id DESC LIMIT 1", [$id]) : null,
         ], 1);
 
         return $id;

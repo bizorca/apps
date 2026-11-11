@@ -8,7 +8,7 @@
     <div class="mt-6 rounded border border-black/10 bg-white p-8 text-center">
       <p class="text-lg font-bold text-navy">Writing…</p>
       <p class="mt-1 text-sm text-muted">
-        Running on the server. Usually 30&ndash;50 seconds.
+        Running on the server. Usually one to two minutes.
         <span x-text="waited ? '(' + waited + 's)' : ''"></span>
       </p>
       <div class="mx-auto mt-4 h-[3px] w-40 animate-pulse bg-gradient-to-r from-gold to-navy"></div>
@@ -49,6 +49,58 @@
     <?php endif; ?>
 
     <pre class="mt-4 whitespace-pre-wrap rounded border border-black/10 bg-white p-4 font-serif text-sm leading-relaxed"><?= h($c['body']) ?></pre>
+
+    <?php if ($c['format'] === 'weekly'):
+      // ── The download ───────────────────────────────────────────────────────
+      // The composer picks the container; this is where to see what it chose,
+      // read the check, and ask for a different one (rewrites only the
+      // download, leaving the post alone).
+      $dspec = json_decode((string) ($c['deliverable_spec'] ?? ''), true);
+      $refs  = [];
+      $jp = \Anglerfish\Core\Database::value(
+          "SELECT payload FROM af_jobs WHERE type='compose' AND subject_type='composition'
+             AND subject_id=? ORDER BY id DESC LIMIT 1", [(int) $c['id']]);
+      foreach ((array) (json_decode((string) $jp, true)['source_refs'] ?? []) as $r) {
+          $sub = \Anglerfish\Models\Composition::subject((string) $r['subject_type'], (int) $r['subject_id']);
+          if ($sub) {
+              $refs[] = ($sub['title'] ?? '') . (!empty($sub['book_title']) ? ' (' . $sub['book_title'] . ')' : '');
+          }
+      }
+    ?>
+      <div class="mt-4 rounded border border-black/10 bg-white p-4 text-sm">
+        <p class="text-[11px] font-bold uppercase tracking-[2px] text-gold">Download</p>
+        <?php if ($dspec): ?>
+          <p class="mt-1"><span class="font-bold text-navy"><?= h($dspec['title'] ?? '') ?></span>
+            <span class="text-muted">&middot; <?= h(str_replace('_', ' ', (string) $c['deliverable'])) ?>,
+            <?= count($dspec['sections'] ?? []) ?> sections</span></p>
+          <ul class="mt-1 list-disc pl-5 text-xs text-muted">
+            <?php foreach (($dspec['sections'] ?? []) as $sec): ?><li><?= h($sec['title'] ?? '') ?></li><?php endforeach; ?>
+          </ul>
+        <?php else: ?>
+          <p class="mt-1 text-muted">No download content stored yet.</p>
+        <?php endif; ?>
+        <?php if (!empty($c['error'])): ?>
+          <p class="mt-2 rounded bg-cream px-2 py-1 text-xs text-navy"><?= h($c['error']) ?></p>
+        <?php endif; ?>
+        <form method="post" action="<?= url('/compose/' . (int) $c['id'] . '/deliverable') ?>" class="mt-3 flex flex-wrap items-center gap-2 text-xs">
+          <?= csrf_field() ?>
+          <span class="text-muted">Change download type:</span>
+          <select name="container" class="rounded border border-black/15 px-2 py-1">
+            <?php foreach (\Anglerfish\Models\Weekly::CONTAINERS as $k => $cc): ?>
+              <option value="<?= h($k) ?>" <?= $k === $c['deliverable'] ? 'selected' : '' ?>><?= h($cc['label']) ?></option>
+            <?php endforeach; ?>
+          </select>
+          <button class="rounded bg-navy px-3 py-1 text-cream hover:bg-navy2">Rewrite download</button>
+          <span class="text-muted">(the post stays as it is)</span>
+        </form>
+        <?php if ($refs): ?>
+          <p class="mt-3 text-[11px] font-bold uppercase tracking-[2px] text-gold">Sources used</p>
+          <ul class="mt-1 list-disc pl-5 text-xs text-muted">
+            <?php foreach ($refs as $r): ?><li><?= h($r) ?></li><?php endforeach; ?>
+          </ul>
+        <?php endif; ?>
+      </div>
+    <?php endif; ?>
 
     <?php
       // ── Citations ──────────────────────────────────────────────────────────

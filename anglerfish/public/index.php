@@ -80,6 +80,7 @@ $router->post('/compose',          [ComposeController::class, 'create']);
 $router->get('/compose/{id}',      [ComposeController::class, 'show']);
 $router->get('/compose/{id}/status', [ComposeController::class, 'status']);
 $router->post('/compose/{id}/promote', [ComposeController::class, 'promote']);
+$router->post('/compose/{id}/deliverable', [ComposeController::class, 'redeliver']);
 $router->get('/weekly',            [WeeklyController::class, 'index']);
 $router->get('/hypnologue',        [ComposeController::class, 'hypnologue']);
 $router->post('/weekly',           [WeeklyController::class, 'create']);

@@ -133,6 +133,22 @@ final class ComposeController
         Api::json($c ? ['ok' => true] + $c : ['ok' => false], $c ? 200 : 404);
     }
 
+    /** POST /compose/{id}/deliverable — rewrite only the download, in another container. */
+    public function redeliver(string $id): void
+    {
+        $container = (string) ($_POST['container'] ?? '');
+        $c = Database::one("SELECT id, format FROM af_compositions WHERE id = ? AND status = 'done'", [(int) $id]);
+        if (!$c || $c['format'] !== 'weekly' || !isset(\Anglerfish\Models\Weekly::CONTAINERS[$container])) {
+            flash('error', 'Pick one of the four download types on a finished weekly post.');
+            redirect('/compose/' . (int) $id);
+        }
+        \Anglerfish\Models\Job::enqueue('redeliver', 'composition', (int) $id,
+            ['composition_id' => (int) $id, 'container' => $container], 1);
+        flash('ok', 'Rewriting the download as a ' . str_replace('_', ' ', $container)
+            . '. It takes about a minute; reload to see it.');
+        redirect('/compose/' . (int) $id);
+    }
+
     public function promote(string $id): void
     {
         $slug = Composition::promote((int) $id);

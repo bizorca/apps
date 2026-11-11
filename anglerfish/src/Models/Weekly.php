@@ -156,6 +156,60 @@ final class Weekly
         );
     }
 
+    /**
+     * The sources a weekly post is written from, chosen without asking.
+     *
+     * Picks from the library material mapped to the module: the strongest
+     * candidates first, at most one per book or collection so the composer
+     * gets more than one author's view, skipping anything a compose job used
+     * in the last 30 days, with a little randomness among the strong ones so
+     * the same module does not produce the same post twice.
+     *
+     * @return list<array{subject_type:string,subject_id:int,title:string,meta:string}>
+     */
+    public static function autoSources(int $moduleId, int $want = 4): array
+    {
+        $used = [];
+        foreach (Database::all(
+            "SELECT payload FROM af_jobs WHERE type = 'compose'
+               AND created_at > NOW() - INTERVAL 30 DAY ORDER BY id DESC LIMIT 60") as $j) {
+            foreach ((array) (json_decode((string) $j['payload'], true)['source_refs'] ?? []) as $r) {
+                $used[($r['subject_type'] ?? '') . ':' . (int) ($r['subject_id'] ?? 0)] = true;
+            }
+        }
+
+        $pool = [];
+        foreach (self::sourcesForModule($moduleId, 60) as $s) {
+            if (!isset($used[$s['subject_type'] . ':' . (int) $s['subject_id']])) {
+                $pool[] = $s;
+            }
+        }
+        if (!$pool) {
+            $pool = self::sourcesForModule($moduleId, 60);   // everything used: start over
+        }
+
+        // Strongest dozen, shuffled, then one per book or collection.
+        $strong = array_slice($pool, 0, 12);
+        shuffle($strong);
+        $out = [];
+        $seen = [];
+        foreach (array_merge($strong, array_slice($pool, 12)) as $s) {
+            $key = mb_strtolower((string) $s['meta']);
+            if (isset($seen[$key])) {
+                continue;
+            }
+            $seen[$key] = true;
+            $out[] = ['subject_type' => (string) $s['subject_type'],
+                      'subject_id'   => (int) $s['subject_id'],
+                      'title'        => (string) $s['title'],
+                      'meta'         => (string) $s['meta']];
+            if (count($out) >= $want) {
+                break;
+            }
+        }
+        return $out;
+    }
+
     /** Has the mapping pass run at all? Drives the empty state on the page. */
     public static function mappedCount(): int
     {

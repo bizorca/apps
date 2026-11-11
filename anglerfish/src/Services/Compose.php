@@ -119,9 +119,35 @@ final class Compose
                 $parts[] = "\n**This is a stall point.** Assume the reader already knows what "
                     . "to do and has not done it. The trap is avoidance, the diagnostic "
                     . "surfaces the avoidance, and the protocol removes the decision rather "
-                    . "than explaining the concept again. Keep it to business behaviour — "
-                    . "resistance to marketing, to raising prices, to installing systems. "
-                    . "Not therapeutic content.";
+                    . "than explaining the concept again. Name the belief underneath in the "
+                    . "psychology beat, in coaching language; keep the post about business "
+                    . "behaviour, not therapy.";
+            }
+        }
+
+        // Weekly posts run without an operator brief: the composer picks the
+        // topic inside the module from the sources and the calendar, and picks
+        // the download container itself.
+        if (($p['format'] ?? '') === 'weekly') {
+            if (!empty($p['today'])) {
+                $parts[] = "\n## Today\n{$p['today']}. Time the topic to what the reader is "
+                    . "facing this week and next (for tax pros, where they are in the tax year).";
+            }
+            if (!empty($p['recent_titles'])) {
+                $parts[] = "\n## Recent weekly posts (do not repeat these topics)\n- "
+                    . implode("\n- ", array_map('strval', $p['recent_titles']));
+            }
+            if (($p['deliverable'] ?? '') === '' || ($p['deliverable'] ?? '') === null) {
+                $last = (string) ($p['last_container'] ?? '');
+                $parts[] = "\n## Download container: your choice\n"
+                    . "Choose the container that fits what the protocol asks the reader to do: "
+                    . "test (when the diagnostic is the point), checklist (something done "
+                    . "repeatedly), worksheet (a decision written down), role_document "
+                    . "(anything handed off). Put your choice in the JSON's \"container\" field."
+                    . ($last !== '' ? " The last weekly post used **" . str_replace('_', ' ', $last)
+                        . "**; choose a different one unless the post plainly needs it." : '')
+                    . " Mention the download once, plainly, in the close, and describe it as the "
+                    . "container you chose.";
             }
         }
 
@@ -140,8 +166,13 @@ final class Compose
         $angle = trim((string) ($p['angle'] ?? ''));
         $parts[] = $angle !== ''
             ? "\n## The operator's angle — build the post around this\n$angle"
-            : "\n## No angle supplied\nWrite from the source material alone. Invent nothing "
-              . "personal: no clients, no anecdotes, no numbers that are not in the source.";
+            : (($p['format'] ?? '') === 'weekly'
+                ? "\n## No angle supplied\nChoose the decision the post is about from the "
+                  . "sources below and the module. Jassen's own proof comes only from the story "
+                  . "bank in the reference section; invent nothing personal."
+                : "\n## No angle supplied\nWrite from the source material alone. Invent nothing "
+                  . "personal: no clients, no anecdotes, no numbers that are not in the source.");
+
 
         if (!empty($p['source'])) {
             $s = $p['source'];
@@ -171,6 +202,29 @@ final class Compose
                     . "Transform it — restate the idea in Jassen's own words and framing. "
                     . "Do not reproduce the list as written.**";
             }
+        }
+
+        // Additional sources (weekly auto-selection). Each is attributed; the
+        // composer draws the tactic from them and builds one post, not a survey.
+        foreach (array_slice((array) ($p['sources'] ?? []), 1) as $i => $x) {
+            $parts[] = "\n## Further source " . ($i + 2)
+                . (!empty($x['attribution']) ? ' — ' . $x['attribution'] : '') . "\n";
+            foreach (['title', 'intro', 'body', 'summary'] as $k) {
+                if (!empty($x[$k])) {
+                    $parts[] = (string) $x[$k];
+                }
+            }
+            foreach (array_slice($x['items'] ?? [], 0, 15) as $it) {
+                $parts[] = '- ' . (is_array($it) ? ($it['text'] ?? '') : $it);
+            }
+            if (!empty($x['verbatim'])) {
+                $parts[] = "\n**Verbatim from a copyrighted book: restate it, never reproduce it.**";
+            }
+        }
+        if (count((array) ($p['sources'] ?? [])) > 1) {
+            $parts[] = "\nThese sources are material, not a reading list. Build one post around "
+                . "one decision, take the tactic from whichever source does it best, and "
+                . "attribute it there.";
         }
 
         // Supporting detail retrieved from the rest of the library. Deliberately

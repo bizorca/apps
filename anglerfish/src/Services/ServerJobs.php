@@ -20,7 +20,7 @@ final class ServerJobs
     /** @return string[] */
     public static function types(): array
     {
-        return ['compose', 'generate_image', 'search_corpus_server', 'audiobook_script',
+        return ['compose', 'redeliver', 'generate_image', 'search_corpus_server', 'audiobook_script',
                 'art_direct', 'image_batch_submit', 'image_batch_poll'];
     }
 
@@ -28,6 +28,7 @@ final class ServerJobs
     {
         return match ($type) {
             'compose'              => self::compose($payload),
+            'redeliver'            => self::redeliver($payload),
             'generate_image'       => self::generateImage($payload),
             'search_corpus_server' => self::searchCorpus($payload),
             'audiobook_script'     => self::audiobookScript($payload),
@@ -42,6 +43,7 @@ final class ServerJobs
     {
         match ($type) {
             'compose'              => self::applyComposition($data),
+            'redeliver'            => self::applyRedeliver($data),
             'generate_image'       => self::applyImage($data),
             'search_corpus_server' => Corpus::applyDeep((int) $data['search_id'], $data),
             'audiobook_script'     => self::applyScript($data),
@@ -133,15 +135,23 @@ final class ServerJobs
         // and the reason is recorded on the composition instead.
         $spec = null;
         $specError = null;
-        if (($p['format'] ?? '') === 'weekly' && !empty($p['deliverable'])) {
-            $checked = Deliverable::check($parsed['deliverable_spec'], (string) $p['deliverable']);
+        $container = null;
+        if (($p['format'] ?? '') === 'weekly') {
+            // The operator's container if one was set, otherwise the one the
+            // composer chose (weekly posts no longer ask; see Compose::user).
+            $container = (string) ($p['deliverable'] ?? '');
+            if ($container === '') {
+                $chosen = (string) ($parsed['deliverable_spec']['container'] ?? '');
+                $container = isset(\Anglerfish\Models\Weekly::CONTAINERS[$chosen]) ? $chosen : 'test';
+            }
+            $checked = Deliverable::check($parsed['deliverable_spec'], $container);
             // The first pass tends to write long. One focused trim call, given
             // only the download and the limits, brings it inside two pages; the
             // trimmed version is kept only if it passes the check cleanly.
             if ($provider === 'anthropic' && $checked['spec'] !== null && $checked['warnings']) {
                 $trimmed = self::trimDeliverable($checked['spec'], $p);
                 if ($trimmed !== null) {
-                    $again = Deliverable::check($trimmed, (string) $p['deliverable']);
+                    $again = Deliverable::check($trimmed, $container);
                     if ($again['spec'] !== null && !$again['warnings']) {
                         $checked = $again;
                     }
@@ -161,7 +171,60 @@ final class ServerJobs
             'body'             => $parsed['body'],
             'deliverable_spec' => $spec,
             'spec_error'       => $specError,
+            'deliverable'      => $container,
         ];
+    }
+
+    /**
+     * Rewrite only a weekly post's download, in a container the operator
+     * picked on the draft page. The post body is left alone. Uses the same
+     * cached system prompt as compose, so the rules and references match.
+     */
+    private static function redeliver(array $p): array
+    {
+        $c = Database::one('SELECT * FROM af_compositions WHERE id = ?', [(int) $p['composition_id']]);
+        if (!$c) {
+            throw new \RuntimeException('Composition not found.');
+        }
+        $container = (string) $p['container'];
+        $user = "# Rewrite the download only\n\nThis weekly post is finished. Write its download "
+            . "again as a **" . str_replace('_', ' ', $container) . "**, following the download "
+            . "rules and that container's shape in the weekly format: practice-agnostic, the "
+            . "psychology inside, two printed pages at most, the post's own number, steps, "
+            . "words and commitment.\n\nReturn only the JSON object, with \"container\": \""
+            . $container . "\". Nothing else.\n\n## The post\n\n" . $c['title'] . "\n\n" . $c['body'];
+        $res = Anthropic::complete(Compose::system(['voice_preset' => $c['voice_preset'] ?: 'bizorca_press']),
+            $user, $p['model'] ?? null, $p['effort'] ?? null);
+        $json = preg_replace('/^```(?:json)?\s*|\s*```$/', '', trim($res['text']));
+        $checked = Deliverable::check(json_decode((string) $json, true), $container);
+        if ($checked['spec'] !== null && $checked['warnings']) {
+            $trimmed = self::trimDeliverable($checked['spec'], $p);
+            $again = $trimmed !== null ? Deliverable::check($trimmed, $container) : null;
+            if ($again && $again['spec'] !== null && !$again['warnings']) {
+                $checked = $again;
+            }
+        }
+        if ($checked['spec'] === null) {
+            throw new \RuntimeException('Download not usable: ' . implode('; ', $checked['errors']));
+        }
+        return [
+            'composition_id' => (int) $c['id'],
+            'container'      => $container,
+            'spec'           => $checked['spec'],
+            'note'           => $checked['warnings'] ? 'Download check: ' . implode('; ', $checked['warnings']) : null,
+        ];
+    }
+
+    private static function applyRedeliver(array $d): void
+    {
+        $spec = json_encode($d['spec'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        Database::run('UPDATE af_compositions SET deliverable=?, deliverable_spec=?, error=? WHERE id=?',
+            [$d['container'], $spec, $d['note'], (int) $d['composition_id']]);
+        // A promoted post carries its own copy; keep it in step so the PDF
+        // renders the new container.
+        Database::run('UPDATE af_posts p JOIN af_compositions c ON c.post_id = p.id
+                          SET p.deliverable=?, p.deliverable_spec=? WHERE c.id=?',
+            [$d['container'], $spec, (int) $d['composition_id']]);
     }
 
     /**
@@ -621,13 +684,14 @@ final class ServerJobs
         Database::run(
             "UPDATE af_compositions
                 SET status='done', title=?, subtitle=?, body=?, model=?, finished_at=NOW(),
-                    deliverable_spec = COALESCE(?, deliverable_spec), error = ?
+                    deliverable_spec = COALESCE(?, deliverable_spec), error = ?,
+                    deliverable = COALESCE(?, deliverable)
               WHERE id=?",
             [$d['title'], $d['subtitle'], $d['body'], $d['model'],
              !empty($d['deliverable_spec'])
                  ? json_encode($d['deliverable_spec'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
                  : null,
-             $d['spec_error'] ?? null, (int) $d['composition_id']]
+             $d['spec_error'] ?? null, $d['deliverable'] ?? null, (int) $d['composition_id']]
         );
     }
 

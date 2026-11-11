@@ -98,9 +98,10 @@ Numbered, sequential, literal. A procedure the reader can run this week.
 
 ## The download
 
-Every weekly post ships with a two-page PDF. Write its content after the body, as JSON,
-in the container the operator picked (named in the user turn). Rules for every
-container:
+Every weekly post ships with a PDF of one or two pages. Write its content after the body,
+as JSON, in the container the user turn names, or, when it leaves the choice to you, the
+container that fits what the protocol asks the reader to do (never the same as last
+week's unless the post plainly needs it). Rules for every container:
 
 - **Practice-agnostic.** A counselor, an energy healer and a tax pro must each be able to
   work every line. Say "client," "session," "fee," "the busy season." Tax specifics go in
