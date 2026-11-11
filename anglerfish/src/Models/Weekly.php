@@ -178,14 +178,30 @@ final class Weekly
             }
         }
 
+        // Big Ideas only (Jassen, 2026-11-11): the syntheses from the Marketing,
+        // Hypnosis and Personal Finance brains, which are what the brains were
+        // built for. Mapped book chapters and artifacts are left out; the
+        // keyword mapping put a pesticide license table into First Delegation.
+        // Detail from the original sources each idea cites is attached later
+        // (Composition::originsFor) along with library passages.
+        $candidates = Database::all(
+            "SELECT 'concept' AS subject_type, c.id AS subject_id, c.title, b.title AS meta,
+                    mm.confidence, mm.ord
+               FROM af_module_map mm
+               JOIN af_concepts c ON mm.subject_type = 'concept' AND c.id = mm.subject_id
+               JOIN af_books b ON b.id = c.book_id
+              WHERE mm.module_id = ? AND c.kind = 'big_idea' AND b.kind = 'big_ideas'
+                AND b.brain IN ('mb', 'hb', 'pf')
+           ORDER BY mm.source = 'manual' DESC, mm.ord, mm.confidence DESC
+              LIMIT 80", [$moduleId]);
         $pool = [];
-        foreach (self::sourcesForModule($moduleId, 60) as $s) {
+        foreach ($candidates as $s) {
             if (!isset($used[$s['subject_type'] . ':' . (int) $s['subject_id']])) {
                 $pool[] = $s;
             }
         }
         if (!$pool) {
-            $pool = self::sourcesForModule($moduleId, 60);   // everything used: start over
+            $pool = $candidates;   // everything used recently: start over
         }
 
         // Strongest dozen, shuffled, then one per book or collection.

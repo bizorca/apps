@@ -221,6 +221,14 @@ final class Compose
                 $parts[] = "\n**Verbatim from a copyrighted book: restate it, never reproduce it.**";
             }
         }
+        if (!empty($p['origins'])) {
+            $parts[] = "\n## Where these ideas come from\nSummaries of the original source files the "
+                . "ideas above cite, for detail and attribution. Attribute to the author named; "
+                . "don't quote a summary as if it were the author's words.\n";
+            foreach ($p['origins'] as $o) {
+                $parts[] = "**{$o['author']}** ({$o['path']}): {$o['summary']}\n";
+            }
+        }
         if (count((array) ($p['sources'] ?? [])) > 1) {
             $parts[] = "\nThese sources are material, not a reading list. Build one post around "
                 . "one decision, take the tactic from whichever source does it best, and "

@@ -217,6 +217,16 @@ final class Composition
         if ($subject) {
             $refs = array_merge([['subject_type' => $in['subject_type'], 'subject_id' => (int) $in['subject_id']]], $refs);
         }
+        // Where each Big Idea came from: the summaries of the original source
+        // files its bullets cite, from the Marketing Brain index on the server.
+        $origins = [];
+        foreach (array_filter(array_merge([$subject], $extra)) as $subj) {
+            foreach (self::originsFor($subj) as $o) {
+                $origins[$o['path']] = $o;
+            }
+        }
+        $origins = array_slice(array_values($origins), 0, 10);
+
         $support = [];
         if (!empty($in['expand'])) {
             $seenPassage = [];
@@ -273,6 +283,7 @@ final class Composition
             // complete record of what the model was actually shown. Weekly
             // posts always get it, across every source.
             'support'        => $support,
+            'origins'        => $origins,
             // Weekly context the composer needs to choose a topic and a
             // container without being told: today's date (the tax calendar),
             // the last few titles (no repeats), the last container (vary it).
@@ -297,6 +308,53 @@ final class Composition
     private static function bookIdOf(?array $s): ?int
     {
         return !empty($s['book_id']) ? (int) $s['book_id'] : null;
+    }
+
+    /**
+     * Original sources behind a Big Idea. Its bullets end with the authors
+     * they came from, "(Sean D'Souza)" or "(Michael Senoff / Bill Bodri)";
+     * this finds those authors' files in the Marketing Brain index that best
+     * match the idea, and returns their summaries for the composer. The full
+     * texts stay on the Mac, so summaries are the detail available here.
+     *
+     * @return list<array{path:string,author:string,summary:string}>
+     */
+    public static function originsFor(?array $subject): array
+    {
+        if (!$subject || empty($subject['body'])) {
+            return [];
+        }
+        preg_match_all('/\(([^()]{3,80})\)\s*$/m', (string) $subject['body'], $m);
+        $names = [];
+        foreach ($m[1] as $grp) {
+            foreach (preg_split('/\s*[\/,;&]\s*|\s+and\s+/', $grp) as $n) {
+                $n = trim($n);
+                if ($n !== '' && preg_match('/^[A-Z][A-Za-z.\'\- ]{2,40}$/', $n)) {
+                    $names[$n] = true;
+                }
+            }
+        }
+        if (!$names) {
+            return [];
+        }
+        $terms = trim(preg_replace('/[^a-z0-9 ]+/i', ' ', (string) ($subject['title'] ?? '')));
+        $out = [];
+        foreach (array_slice(array_keys($names), 0, 4) as $name) {
+            $rows = Database::all(
+                "SELECT path, author, summary,
+                        MATCH(summary) AGAINST (? IN NATURAL LANGUAGE MODE) AS score
+                   FROM af_sources
+                  WHERE author LIKE ? AND summary IS NOT NULL
+               ORDER BY score DESC LIMIT 2",
+                [$terms !== '' ? $terms : $name, '%' . $name . '%']);
+            foreach ($rows as $r) {
+                if ((float) $r['score'] > 0 || $terms === '') {
+                    $out[] = ['path' => (string) $r['path'], 'author' => (string) $r['author'],
+                              'summary' => mb_substr((string) $r['summary'], 0, 1200)];
+                }
+            }
+        }
+        return $out;
     }
 
     private static function sourceForPrompt(?array $s): ?array
