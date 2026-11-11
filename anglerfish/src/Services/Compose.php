@@ -54,8 +54,8 @@ final class Compose
             "\n## Output\nReturn exactly this, nothing else:\n"
             . "TITLE: <the title>\nSUBTITLE: <one line>\nBODY:\n<the post>\n\n"
             . "The body is plain text: blank line between paragraphs, `- ` for bullets, "
-            . "`1. ` for numbered lists, and a line reading exactly `Go!` before the "
-            . "closing section. No markdown headings, no HTML.\n\n"
+            . "`1. ` for numbered lists. No heading over the closing section, no "
+            . "markdown headings, no HTML.\n\n"
             . "Hit the requested length. Do not pad to reach it and do not run past "
             . "it — a post that says the thing in fewer words is finished, not short. "
             . "No preamble, no commentary on your own draft, no alternatives.",
@@ -72,7 +72,7 @@ final class Compose
         // stored on compositions.length. Rather than add a fourth enum value
         // that only one format can use, the format decides its own length.
         $parts[] = 'Length: ' . (($p['format'] ?? '') === 'weekly'
-            ? '900-1400 words of body, excluding the deliverable'
+            ? '1100-1500 words of body, excluding the deliverable'
             : (self::LENGTHS[$p['length'] ?? 'medium'] ?? self::LENGTHS['medium']));
 
         // The curriculum slot. Present only on weekly posts, and the reason the
@@ -103,7 +103,7 @@ final class Compose
                 . "write it out in full in the post body — the PDF is the working copy of "
                 . "what the reader just read, never the continuation of it. Anything that "
                 . "renders as a list appears in both places. Mention the download once, "
-                . "plainly, in the Go! section.";
+                . "plainly, in the close.";
         }
 
         $angle = trim((string) ($p['angle'] ?? ''));

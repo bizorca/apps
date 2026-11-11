@@ -7,7 +7,7 @@ use Anglerfish\Core\Database;
 /**
  * The weekly post format and the twelve-module curriculum behind it.
  *
- * One shape every week — trap, diagnostic, protocol, Go! — slotted against a
+ * One shape every week — trap, diagnostic, psychology, protocol, close — slotted against a
  * curriculum module and shipping one freely downloadable PDF deliverable. This
  * sits alongside the six rotating formats rather than replacing them: 410
  * drafts carry those values and the compose flow still offers them.
@@ -54,10 +54,12 @@ final class Weekly
                           . 'scenario, then the turn.',
         'The Diagnostic' => 'The load-bearing movement. The reader applies something to their own '
                           . 'practice and arrives at the diagnosis themselves.',
-        'The Protocol'   => 'Numbered, sequential, literal. Written out in full in the post body, '
-                          . 'not held back for the PDF.',
-        'Go!'            => 'Warmer and more playful than the body. Repeat the one action, name '
-                          . 'the technique, mention the download once.',
+        'The Psychology' => 'Name the belief that has stopped the reader, in their own words, and '
+                          . 'say why it is partly true. Coaching language, no diagnosis.',
+        'The Protocol'   => 'Numbered steps that make the decision: exact words to use and a '
+                          . 'commitment step. Written out in full in the post body.',
+        'The Close'      => 'One-line recap, the one action repeated, the download mentioned '
+                          . 'once, and exactly one invitation. No heading, no plugs.',
     ];
 
     /** @return array<int,array> The twelve, in dependency order. */

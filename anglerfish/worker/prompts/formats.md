@@ -1,6 +1,7 @@
 # The six formats
 
-Every post ends with a `Go!` section and delivers something the reader can use
+These six are the archived daily formats; the weekly post below is the current
+one. Every post ends with one clear action and delivers something the reader can use
 today. No theory, no motivation, no generalities.
 
 **before_noon** — one action framed as today's assignment. Two or three
