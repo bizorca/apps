@@ -48,9 +48,34 @@ final class Compose
             $specs[] = file_get_contents("$dir/format-weekly.md");
         }
 
+        // Bizorca's composer reads the real sources, not a summary of them: the
+        // full style guide, the story bank (with every "Check:" note, so it knows
+        // which figures are disputed) and the curriculum. Copies of the Dropbox
+        // originals, refreshed by writer/substack-tools/sync_prompts.sh. About
+        // 32K tokens, cached with the rest of this prefix, so a post rereads
+        // them for about a cent. Hypnologue never sees them.
+        $refs = [];
+        if (basename($voice) === 'voice-bizorca-press.md') {
+            foreach ([
+                'bizorca-style-guide.md' => "Jassen's full writing style guide. Use it for voice. "
+                    . 'Where it disagrees with the voice spec or the weekly format above (the Go! '
+                    . 'register, tool references, shoutouts, length), the voice spec and format win.',
+                'bizorca-story-bank.md'  => 'The stories Jassen actually tells. Personal proof comes '
+                    . 'only from here or from the operator\'s angle. Tell a story the way it is told '
+                    . 'here, and never use a figure listed under "Check:"; drop the number instead.',
+                'bizorca-curriculum.md'  => 'The twelve-module curriculum every post is tagged '
+                    . 'against, with each module\'s premise and artifact.',
+            ] as $file => $how) {
+                if (is_file("$dir/$file")) {
+                    $refs[] = "\n---\n# Reference: $file\n$how\n\n" . file_get_contents("$dir/$file");
+                }
+            }
+        }
+
         return implode("\n", [
             file_get_contents($voice),
             ...$specs,
+            ...$refs,
             "\n## Output\nReturn exactly this, nothing else:\n"
             . "TITLE: <the title>\nSUBTITLE: <one line>\nBODY:\n<the post>\n\n"
             . "The body is plain text: blank line between paragraphs, `- ` for bullets, "

@@ -29,6 +29,17 @@ final class Anthropic
      */
     private const TIMEOUT = 90.0;
 
+    /**
+     * Cron and `cli.php work` have no 120s cap, and a weekly post composed
+     * against the full style guide and story bank can run past 90s at high
+     * effort, so the command line gets five minutes (still inside the
+     * 600s job lease). Web ticks keep the 90s ceiling above.
+     */
+    private static function timeout(): float
+    {
+        return PHP_SAPI === 'cli' ? 300.0 : self::TIMEOUT;
+    }
+
     public static function configured(): bool
     {
         return self::key() !== '';
@@ -104,10 +115,10 @@ final class Anthropic
         return new Client(
             apiKey: $key,
             requestOptions: RequestOptions::with(
-                timeout: self::TIMEOUT,
+                timeout: self::timeout(),
                 maxRetries: 0,
                 transporter: new Guzzle([
-                    'timeout'         => self::TIMEOUT,
+                    'timeout'         => self::timeout(),
                     'connect_timeout' => 10.0,
                 ]),
             ),
