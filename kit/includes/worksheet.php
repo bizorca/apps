@@ -113,3 +113,128 @@ function renderPeriodField(array $assessment, string $placeholder): string
          . ' value="' . h($assessment['period_label'] ?? '') . '">'
          . '</div>';
 }
+
+// ---------------------------------------------------------------------------
+// Phase 1 helpers (2026-11-11)
+// ---------------------------------------------------------------------------
+
+/** The data of the latest run of another instrument for this client, or []. */
+function latestData(int $clientId, string $instrumentKey): array
+{
+    $a = latestAssessment($clientId, $instrumentKey);
+    return $a['data'] ?? [];
+}
+
+/**
+ * Fill empty fields for display from another instrument's latest run.
+ *
+ * Only on a run that has nothing saved yet, and only into empty keys: a value
+ * the advisor typed is never overwritten. Nothing is written until Save, and
+ * every prefilled field is named in $notes so the advisor can see where it
+ * came from.
+ */
+function prefill(array $data, array $values, string $source, array &$notes): array
+{
+    $filled = [];
+    foreach ($values as $key => [$label, $value]) {
+        $empty = !isset($data[$key]) || $data[$key] === '' || $data[$key] === [] || $data[$key] === 0.0 || $data[$key] === 0;
+        $has   = is_array($value) ? $value !== []
+               : (is_numeric($value) ? (float) $value !== 0.0 : trim((string) $value) !== '');
+        if ($empty && $has) {
+            $data[$key] = $value;
+            $filled[] = $label;
+        }
+    }
+    if ($filled) $notes[] = implode(', ', $filled) . ' from the latest ' . $source . '.';
+    return $data;
+}
+
+function renderPrefillNotes(array $notes): string
+{
+    if (!$notes) return '';
+    $out = '<div class="no-print mb-6 rounded border border-primary/30 bg-primary-soft px-3 py-2 text-sm">'
+         . '<strong>Prefilled, not yet saved.</strong> ';
+    foreach ($notes as $n) $out .= h($n) . ' ';
+    return $out . 'Check each figure, then press Save.</div>';
+}
+
+/** Is this a fresh run with nothing saved? Prefill only happens then. */
+function isFreshRun(array $data): bool
+{
+    return $data === [];
+}
+
+/**
+ * The close every Phase 1 instrument shares: the behavioral line, then a
+ * pointer to the next instrument in layer order.
+ */
+function renderBehavioralSection(array $data, string $example, string $next): string
+{
+    return '<section class="card mt-6 p-5">'
+         . sectionHead('Close', 'The sentence in my head when I think about doing this',
+             'In the owner\'s words. Stall points are behavioral far more often than informational; '
+             . 'name the avoidance so the plan can assume it.')
+         . '<textarea class="field" name="behavior_line" rows="2" placeholder="' . h($example) . '">'
+         . h((string) ($data['behavior_line'] ?? '')) . '</textarea>'
+         . '<p class="mt-4 text-sm text-muted">Next: ' . h($next) . '</p>'
+         . '</section>';
+}
+
+/** A labeled single-line text input bound to a data key. */
+function textField(array $data, string $key, string $label, string $placeholder = '', string $hint = '', string $type = 'text'): string
+{
+    return '<div><label class="label" for="' . h($key) . '">' . h($label) . '</label>'
+         . '<input class="field mt-1" type="' . h($type) . '" id="' . h($key) . '" name="' . h($key) . '"'
+         . ' placeholder="' . h($placeholder) . '" value="' . h((string) ($data[$key] ?? '')) . '">'
+         . ($hint !== '' ? '<p class="hint">' . h($hint) . '</p>' : '')
+         . '</div>';
+}
+
+/** A labeled number/money input bound to a data key. */
+function numField(array $data, string $key, string $label, string $hint = '', string $placeholder = ''): string
+{
+    $v = $data[$key] ?? '';
+    return '<div><label class="label" for="' . h($key) . '">' . h($label) . '</label>'
+         . '<input class="field amount mt-1" id="' . h($key) . '" name="' . h($key) . '" inputmode="decimal"'
+         . ' placeholder="' . h($placeholder) . '" value="' . h(is_float($v) || is_int($v) ? rtrim(rtrim(number_format((float) $v, 2, '.', ''), '0'), '.') : (string) $v) . '">'
+         . ($hint !== '' ? '<p class="hint">' . h($hint) . '</p>' : '')
+         . '</div>';
+}
+
+/** A labeled textarea bound to a data key. */
+function areaField(array $data, string $key, string $label, string $placeholder = '', int $rows = 3, string $hint = ''): string
+{
+    return '<div><label class="label" for="' . h($key) . '">' . h($label) . '</label>'
+         . '<textarea class="field mt-1" id="' . h($key) . '" name="' . h($key) . '" rows="' . $rows . '"'
+         . ' placeholder="' . h($placeholder) . '">' . h((string) ($data[$key] ?? '')) . '</textarea>'
+         . ($hint !== '' ? '<p class="hint">' . h($hint) . '</p>' : '')
+         . '</div>';
+}
+
+/** Collect a list of text keys from POST. */
+function postTexts(array $keys): array
+{
+    $out = [];
+    foreach ($keys as $k) $out[$k] = post($k);
+    return $out;
+}
+
+/** Collect a list of numeric keys from POST. */
+function postNums(array $keys): array
+{
+    $out = [];
+    foreach ($keys as $k) $out[$k] = postNum($k);
+    return $out;
+}
+
+/** Reading panel: badge, note, math, and the threshold legend. */
+function renderReadingPanel(array $calc, string $legend, string $heading = 'Reading'): string
+{
+    return '<div class="mt-5 rounded-md border border-hairline p-4">'
+         . '<div class="flex items-center justify-between gap-3"><span class="text-sm font-semibold">' . h($heading) . '</span>'
+         . renderReading($calc['reading']) . '</div>'
+         . (isset($calc['note']) ? '<p class="mt-2 text-sm">' . h($calc['note']) . '</p>' : '')
+         . renderSteps($calc['steps'])
+         . ($legend !== '' ? '<p class="mt-3 text-xs text-muted">' . h($legend) . '</p>' : '')
+         . '</div>';
+}

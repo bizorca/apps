@@ -66,7 +66,7 @@ fact. Regulatory content points at the agency to verify with. Do not add a rate.
 ## Build and test
 ```bash
 ./build-css.sh            # only when Tailwind utility classes change (npx tailwindcss@3.4.17)
-php tests/calc_test.php   # 39 checks from the framework's worked cases; must pass
+php tests/calc_test.php   # 102 checks from the framework's worked cases and the Phase 1 worked examples; must pass
 ```
 `public/assets/tailwind.css` is a committed build artifact; the server never needs Node.
 Local dev: `php -S 127.0.0.1:8080 dev-router.php` from the repo root, then /kit/.
@@ -138,15 +138,38 @@ share a `(client_id, instrument)`, and the client page shows the latest.
   Unchecked boxes submit nothing, so bare `[]` arrays fall out of alignment with the
   other columns and silently attach flags to the wrong activity.
 
-## Not built yet
-The framework's Part 7.6 instruments are described in one line each — not enough to
-re-create faithfully. They are deliberately absent rather than guessed at:
-Allocation Sequence (2.1), Collections Calendar (2.3), Modular Task Library (3.1),
-Service Agreement (3.2), Delegation Decision Matrix (3.3), Alignment Matrix and
-Fixed-Scope Offers (4.1), Micro-Workshop Framework (4.3), Referral Source Map (4.4).
+## Phase 1 instruments (built 2026-11-11, deployed 2026-11-12 at Jassen's request; AI-drafted, his review still pending)
+The eight Part 7.6 instruments that used to be listed here as "not built" now exist, designed in
+`~/Dropbox/Business Coaching/EDC Curriculum/Phase 1 - Instrument Spec.md` and built under the
+Claude-time-only decision of 2026-11-11. Every call made without Jassen is in
+`Phase 1 - Decisions Log.md` beside the spec; read it before changing a threshold or a figure.
+Printable blank and worked-example PDFs live in `Advisor Curriculum/Instruments/` there.
 
-The Collections Calendar is the one the worked case most wants next — the health check
-already offers it as a "next instrument" pointer with nowhere to go.
+| Key | Page | Unit | Calc |
+|---|---|---|---|
+| `allocation` | `a/allocation.php` | 2.1 | `calcAllocation()` |
+| `collections` | `a/collections.php` | 2.3 | `calcCollections()` |
+| `tasklib` | `a/tasklib.php` (`&print=1` prints entries) | 3.1 | `calcTaskLibrary()` |
+| `agreement` | `a/agreement.php` (`&print=1` prints the attorney-review draft) | 3.2 | `calcCeiling()` |
+| `delegation` | `a/delegation.php` | 3.3 | `calcDelegation()` |
+| `offer` | `a/offer.php` | 4.1 | `calcOffer()` |
+| `workshop` | `a/workshop.php` | 4.2 | `calcWorkshopRun()` |
+| `referrals` | `a/referrals.php` | 4.3 | `calcReferralShare()` |
+
+- **Starting-point thresholds** are constants at the top of the Phase 1 block in `calc.php`
+  (`TH_*`, `FIT_*`). Change the constant, the test, and the worked PDF together.
+- **Prefill:** a fresh run (nothing saved) fills empty fields from the latest EHR, Health Check,
+  or Capacity Audit run, says so in a banner, and writes nothing until Save (`prefill()` in
+  `worksheet.php`).
+- **The Micro-Workshop has no reading by design** (no source for a conversion benchmark).
+- **Delegation candidates without a judgment or going rate are not scored**; a blank rate read
+  as $0 would make every task look like free money.
+- `suggestedNext()` still walks only the first-meeting assessment; the new instruments install
+  systems in later sessions. The dashboard's "x of N instruments" now counts 15.
+- The framework document still numbers the market units 4.2 to 4.4 (13-unit scheme); the Kit
+  uses the 12-unit numbering. Renumbering the framework is Jassen's call.
+- Known pre-existing issue, not fixed: the packet's "Print or save as PDF" button uses an inline
+  `onclick`, which the CSP (`script-src 'self'`) blocks. Browser Print works.
 
 ## To do (Jassen, 2026-10-20)
 - **Coaching sales pipeline and client education portal: spec only, nothing built.**

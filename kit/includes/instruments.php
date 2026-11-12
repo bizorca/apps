@@ -55,6 +55,24 @@ function instruments(): array
             'why'      => 'The single most clarifying number for most owners.',
             'duration' => '30 minutes',
         ],
+        'allocation' => [
+            'name'     => 'Allocation Sequence',
+            'page'     => 'allocation.php',
+            'layer'    => 'F',
+            'unit'     => 'Unit 2.1',
+            'summary'  => 'Tax reserve and baseline owner pay come off the top; operating fits inside what remains.',
+            'why'      => 'Ends residual pay. The multi-account structure derives from Profit First (Mike Michalowicz).',
+            'duration' => '30 minutes',
+        ],
+        'collections' => [
+            'name'     => 'Collections Calendar',
+            'page'     => 'collections.php',
+            'layer'    => 'F',
+            'unit'     => 'Unit 2.3',
+            'summary'  => 'Receivables by age, terms the owner will enforce, and a dated follow-up sequence.',
+            'why'      => 'Where the behavioral block shows up most reliably, so the plan assumes avoidance.',
+            'duration' => '30 minutes',
+        ],
         'swot' => [
             'name'     => 'SWOT with the Evidence Rule, and TOWS',
             'page'     => 'swot.php',
@@ -64,6 +82,33 @@ function instruments(): array
             'why'      => 'A conversation tool, not a deliverable.',
             'duration' => 'First meeting',
         ],
+        'offer' => [
+            'name'     => 'The Offer, the Client, and the Channel',
+            'page'     => 'offer.php',
+            'layer'    => 'O',
+            'unit'     => 'Unit 4.1',
+            'summary'  => 'The Awareness Question, client fit, and fixed-scope tiers checked against the floor.',
+            'why'      => 'Most marketing problems are offer problems.',
+            'duration' => '45 minutes',
+        ],
+        'workshop' => [
+            'name'     => 'Micro-Workshop Framework',
+            'page'     => 'workshop.php',
+            'layer'    => 'O',
+            'unit'     => 'Unit 4.2',
+            'summary'  => 'A teaching workshop that does the diagnosis, plus show rate and conversion per run.',
+            'why'      => 'For buyers who do not yet know they have the problem. Teaching, not pitching.',
+            'duration' => '45 minutes',
+        ],
+        'referrals' => [
+            'name'     => 'Three-Source Referral System',
+            'page'     => 'referrals.php',
+            'layer'    => 'O',
+            'unit'     => 'Unit 4.3',
+            'summary'  => 'Named sources, a specific ask, an easy way to refer, and a consistent thank-you.',
+            'why'      => 'Replaces "network more" with a mechanism.',
+            'duration' => '30 minutes',
+        ],
         'capacity' => [
             'name'     => 'Capacity Audit and Handoff Test',
             'page'     => 'capacity.php',
@@ -71,6 +116,33 @@ function instruments(): array
             'unit'     => 'Units 3.1 and 3.2',
             'summary'  => 'Where the owner\'s week goes, and what a successor would need.',
             'why'      => 'If you had to hand this business to someone next month, what would they need?',
+            'duration' => '30 minutes',
+        ],
+        'tasklib' => [
+            'name'     => 'Modular Task Library',
+            'page'     => 'tasklib.php',
+            'layer'    => 'Op',
+            'unit'     => 'Unit 3.1',
+            'summary'  => 'The recurring work written down, most fragile first, with coverage measured.',
+            'why'      => 'The franchise prototype for a solo practice, after Michael Gerber\'s The E-Myth Revisited.',
+            'duration' => 'Ongoing',
+        ],
+        'agreement' => [
+            'name'     => 'Service Agreement',
+            'page'     => 'agreement.php',
+            'layer'    => 'Op',
+            'unit'     => 'Unit 3.2',
+            'summary'  => 'A weekly job ceiling set in advance, plus scope and response windows in writing.',
+            'why'      => 'Bounds the work before it breaks the owner. An attorney reviews the agreement.',
+            'duration' => '45 minutes',
+        ],
+        'delegation' => [
+            'name'     => 'Delegation Decision Matrix',
+            'page'     => 'delegation.php',
+            'layer'    => 'Op',
+            'unit'     => 'Unit 3.3',
+            'summary'  => 'Which task to hand off first, the role, what "done" looks like, and the paid trial.',
+            'why'      => '"I can\'t afford help," said while doing $30-an-hour work at a $150-an-hour rate.',
             'duration' => '30 minutes',
         ],
         'priority' => [
@@ -174,6 +246,57 @@ function instrumentSummary(string $key, ?array $assessment): array
             return [$n > 0 ? READ_WATCH : READ_HEALTHY, sprintf(
                 '%d entr%s · %s', $s['total'], $s['total'] === 1 ? 'y' : 'ies',
                 $n > 0 ? $n . ' without evidence' : 'all evidenced')];
+
+        case 'allocation':
+            $x = calcAllocation($d);
+            if ($x['reading'] === READ_UNKNOWN) return [READ_UNKNOWN, 'In progress'];
+            return [$x['reading'], 'Gap per allocation ' . money0($x['b7'])
+                . ($x['b7'] < 0 ? ' (' . pct($x['shortShare']) . ' short)' : '')];
+
+        case 'collections':
+            $x = calcCollections($d);
+            if ($x['reading'] === READ_UNKNOWN) return [READ_UNKNOWN, 'In progress'];
+            return [$x['reading'], money0($x['b1']) . ' open · ' . pct($x['b3']) . ' past 60 days'
+                . ($x['daily'] > 0 ? ' · DSO ' . number_format($x['b2'], 1) : '')];
+
+        case 'tasklib':
+            $x = calcTaskLibrary($d);
+            if ($x['reading'] === READ_UNKNOWN) return [READ_UNKNOWN, 'In progress'];
+            return [$x['reading'], pct($x['coverage']) . ' coverage · ' . number_format($x['fragile'], 0)
+                . ' "only me" hrs not written · ' . count($x['entries']) . ' entr' . (count($x['entries']) === 1 ? 'y' : 'ies')];
+
+        case 'agreement':
+            $x = calcCeiling($d);
+            if ($x['reading'] === READ_UNKNOWN) return [READ_UNKNOWN, 'In progress'];
+            return [$x['reading'], 'Ceiling ' . $x['a5'] . ' jobs/week · current ' . number_format($x['currentJobs'], 1)];
+
+        case 'delegation':
+            $x = calcDelegation($d);
+            if ($x['top'] === null) return [READ_UNKNOWN, 'In progress'];
+            return [$x['reading'], 'First: ' . mb_strimwidth((string) $x['top']['task'], 0, 40, '…')
+                . ' · ' . money0((float) $x['top']['value']) . '/week'];
+
+        case 'offer':
+            $x = calcOffer($d);
+            if (!$x['tiers'] && $x['channel'] === '' && $x['conc_reading'] === READ_UNKNOWN) return [READ_UNKNOWN, 'In progress'];
+            $below = count(array_filter($x['tiers'], fn($t) => $t['reading'] === READ_ACT));
+            $bits = [];
+            if ($x['channel'] !== '') $bits[] = str_replace(' acquisition', '', preg_replace('/ \(Unit .*\)$/', '', $x['channel']));
+            if ($x['tiers']) $bits[] = count($x['tiers']) . ' tier' . (count($x['tiers']) === 1 ? '' : 's') . ($below ? ', ' . $below . ' below floor' : ', all at or above floor');
+            if ($x['conc_reading'] !== READ_UNKNOWN) $bits[] = 'top client ' . pct($x['conc']);
+            return [$x['reading'], implode(' · ', $bits)];
+
+        case 'workshop':
+            $x = calcWorkshopRun($d);
+            if (!$x['runs']) return [READ_UNKNOWN, trim((string) ($d['title'] ?? '')) !== '' ? 'Designed, no runs logged' : 'In progress'];
+            return [READ_UNKNOWN, count($x['runs']) . ' run' . (count($x['runs']) === 1 ? '' : 's')
+                . ' · show ' . pct($x['show']) . ' · conversion ' . pct($x['conv']) . ' (tracked, no reading)'];
+
+        case 'referrals':
+            $x = calcReferralShare($d);
+            if ($x['reading'] === READ_UNKNOWN) return [READ_UNKNOWN, 'In progress'];
+            return [$x['reading'], pct($x['share']) . ' of new clients from ' . count($x['sources']) . ' named sources'
+                . ($x['overdue'] ? ' · ' . $x['overdue'] . ' overdue for a touch' : '')];
 
         case 'priority':
             $p = calcPriority($d);

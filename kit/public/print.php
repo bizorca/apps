@@ -154,6 +154,36 @@ renderHeader(compact('pageTitle', 'client'));
     </section>
   <?php endif; ?>
 
+  <?php
+  // Phase 1 instruments: the reading and the math, from the latest run of each.
+  $phase1 = [
+      'allocation'  => fn($d) => calcAllocation($d),
+      'collections' => fn($d) => calcCollections($d),
+      'tasklib'     => fn($d) => calcTaskLibrary($d),
+      'agreement'   => fn($d) => calcCeiling($d),
+      'delegation'  => fn($d) => calcDelegation($d),
+      'offer'       => fn($d) => calcOffer($d),
+      'workshop'    => fn($d) => calcWorkshopRun($d),
+      'referrals'   => fn($d) => calcReferralShare($d),
+  ];
+  foreach ($phase1 as $k => $fn):
+      if (!$a[$k]) continue;
+      $pc = $fn($a[$k]['data']);
+      if (!$pc['steps']) continue;
+      [, $headline] = instrumentSummary($k, $a[$k]); ?>
+    <section class="mt-8 print-break">
+      <h2 class="text-lg font-semibold"><?= h(instrumentName($k)) ?></h2>
+      <p class="hint"><?= h(instruments()[$k]['unit']) ?> · <?= h($headline) ?></p>
+      <div class="mt-3">
+        <?= renderMetric(instrumentName($k), $a[$k]['period_label'] !== '' ? $a[$k]['period_label'] : niceDate($a[$k]['updated_at']),
+                         $pc + ['note' => $pc['note'] ?? '']) ?>
+      </div>
+      <?php if (trim((string) ($a[$k]['data']['behavior_line'] ?? '')) !== ''): ?>
+        <blockquote class="mt-3 border-l-2 border-primary pl-4 text-sm italic"><?= h($a[$k]['data']['behavior_line']) ?></blockquote>
+      <?php endif; ?>
+    </section>
+  <?php endforeach; ?>
+
   <footer class="mt-10 border-t border-hairline pt-4 text-xs text-muted">
     <p>
       This packet organizes an assessment. It is not tax, legal, accounting, or insurance
