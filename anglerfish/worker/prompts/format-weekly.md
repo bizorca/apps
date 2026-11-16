@@ -93,7 +93,8 @@ The PDF is not attached on Substack. It is hosted at financialhypnosis.com/d/<na
 serves and counts it, and both mentions link there with the post's tag:
 `https://financialhypnosis.com/d/<name>?src=bizorca-<post-slug>`. Name the file after the
 download's title (`fee-reset-score`). When the post is published, the rendered PDF is copied
-into the website repo's `public/downloads/<name>.pdf` and deployed.
+into the website repo's `public/downloads/<name>.pdf`, its row is added to `includes/downloads.php`
+(financialhypnosis.com/downloads/ lists every one, newest first), and the site is deployed.
 
 ## The standing risks
 

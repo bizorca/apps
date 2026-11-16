@@ -110,6 +110,47 @@
       </form>
     </div>
 
+    <?php if (!empty($download)): ?>
+    <div class="mt-6 border-t border-black/10 pt-4">
+      <h2 class="text-[11px] font-bold uppercase tracking-[2px] text-gold">The download</h2>
+      <?php if (!$download['has_spec']): ?>
+        <p class="mt-2 text-xs text-muted">No download content on this post.</p>
+      <?php else: ?>
+        <p class="mt-1 text-sm text-navy"><?= h($download['title']) ?>
+          <span class="text-muted">&middot; <?= h(str_replace('_', ' ', (string) $post['deliverable'])) ?></span></p>
+        <?php if ($download['pdf']): ?>
+          <a href="<?= url('/media/asset/' . (int) $download['pdf']['id'] . '?download=1') ?>"
+             class="mt-2 inline-block rounded bg-navy px-3 py-1 text-xs text-cream hover:bg-navy2">Download the PDF &darr;</a>
+          <span class="text-[11px] text-muted">v<?= (int) $download['pdf']['version'] ?>, <?= h(date('M j', strtotime((string) $download['pdf']['created_at']))) ?></span>
+        <?php elseif ($download['pending']): ?>
+          <p class="mt-2 text-xs text-muted">PDF render queued. The Mac worker picks it up; to run it now:
+            <code>angler.py --once --types render</code>. Reload this page after.</p>
+        <?php endif; ?>
+        <div class="mt-2 flex flex-wrap items-center gap-2 text-xs">
+          <form method="post" action="<?= url('/render') ?>">
+            <?= csrf_field() ?>
+            <input type="hidden" name="subject_type" value="post">
+            <input type="hidden" name="subject_id" value="<?= (int) $post['id'] ?>">
+            <input type="hidden" name="target" value="weekly_deliverable">
+            <input type="hidden" name="back" value="<?= h('/posts/' . rawurlencode($post['slug'])) ?>">
+            <button class="rounded border border-navy px-3 py-1 text-navy hover:bg-navy hover:text-cream">
+              <?= $download['pdf'] ? 'Re-render the PDF' : 'Render the PDF' ?></button>
+          </form>
+          <?php if ($download['composition']): ?>
+            <a href="<?= url('/compose/' . (int) $download['composition'] . '/download') ?>" target="_blank"
+               class="text-navy hover:text-gold">Print-ready preview &rarr;</a>
+          <?php endif; ?>
+        </div>
+        <?php if ($download['site_name'] !== ''): ?>
+          <p class="mt-2 text-[11px] text-muted">On the website: save it as
+            <code>public/downloads/<?= h($download['site_name']) ?>.pdf</code>, add its row to
+            <code>includes/downloads.php</code>, and deploy. The post links
+            financialhypnosis.com/d/<?= h($download['site_name']) ?>; check the post body uses that name.</p>
+        <?php endif; ?>
+      <?php endif; ?>
+    </div>
+    <?php endif; ?>
+
     <?php /* Header image. The post page is where Substack actually gets fed,
              so the image belongs in this workflow, not on a separate screen. */ ?>
     <div class="mt-6 border-t border-black/10 pt-4">

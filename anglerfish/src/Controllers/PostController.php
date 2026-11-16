@@ -88,8 +88,33 @@ final class PostController
               ORDER BY version DESC", [(int) $post['id']]);
 
 
+        // Weekly posts: the download. The rendered PDF is an asset on the post
+        // (render target weekly_deliverable); the composition it came from has the
+        // print-ready preview. The handoff screen is where the PDF goes out to the
+        // website, so it belongs here, not only on /compose (Jassen, 2026-11-16).
+        $download = null;
+        if (($post['format'] ?? '') === 'weekly') {
+            $spec = json_decode((string) ($post['deliverable_spec'] ?? ''), true);
+            $download = [
+                'has_spec'    => is_array($spec),
+                'title'       => is_array($spec) ? (string) ($spec['title'] ?? '') : '',
+                'pdf'         => Database::one(
+                    "SELECT id, version, created_at FROM af_assets
+                      WHERE subject_type='post' AND subject_id=? AND target='weekly_deliverable' AND status='ready'
+                      ORDER BY version DESC, id DESC LIMIT 1", [(int) $post['id']]),
+                'pending'     => (bool) Database::value(
+                    "SELECT COUNT(*) FROM af_jobs WHERE type='render' AND subject_type='post' AND subject_id=?
+                        AND status IN ('queued','leased','running')", [(int) $post['id']]),
+                'composition' => Database::value(
+                    'SELECT id FROM af_compositions WHERE post_id = ? ORDER BY id DESC LIMIT 1', [(int) $post['id']]),
+            ];
+            // The name on financialhypnosis.com/d/<name>: the download's own title, slugged.
+            $download['site_name'] = trim((string) preg_replace('/[^a-z0-9]+/', '-',
+                strtolower(preg_replace('/^the\s+/i', '', $download['title']))), '-');
+        }
+
         View::render('post', [
-            'images' => $images,'post' => $post], $post['title']);
+            'images' => $images, 'post' => $post, 'download' => $download], $post['title']);
     }
 
     /** Save edits made on the handoff screen. */

@@ -97,7 +97,9 @@ final class DeliverableHtml
 
         $tag = 'Bizorca Press' . (!empty($spec['sequence']) ? ' &nbsp;·&nbsp; No. ' . (int) $spec['sequence'] : '')
             . (!empty($spec['module_number']) ? ' &nbsp;·&nbsp; Module ' . (int) $spec['module_number'] : '');
-        $url = $e($spec['post_url'] ?? 'bizorca.com');
+        // financialhypnosis.com on every page since 2026-11-16, same as render.py's SITE_URL:
+        // the PDFs live there now (/d/<name>), and a visit there is the point of the post.
+        $url = 'financialhypnosis.com';
         $date = $e($spec['date'] ?? '');
         $footer = "<footer><div class='ft'><b>$tag</b>&nbsp;·&nbsp;$url" . ($date !== '' ? "&nbsp;·&nbsp;$date" : '') . '</div>'
             . '<div>' . $e(self::COHORT_LINES[$cohort] ?? '') . '</div>'
