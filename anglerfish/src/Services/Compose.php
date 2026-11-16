@@ -101,7 +101,7 @@ final class Compose
         // stored on compositions.length. Rather than add a fourth enum value
         // that only one format can use, the format decides its own length.
         $parts[] = 'Length: ' . (($p['format'] ?? '') === 'weekly'
-            ? '1100-1500 words of body, excluding the deliverable'
+            ? '650-850 words of body, excluding the deliverable'
             : (self::LENGTHS[$p['length'] ?? 'medium'] ?? self::LENGTHS['medium']));
 
         // The curriculum slot. Present only on weekly posts, and the reason the

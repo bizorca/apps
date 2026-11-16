@@ -7,7 +7,9 @@ The post takes a decision the reader already knows they should make and hasn't. 
 them a procedure that makes the decision for them, and it names the belief that has been
 stopping them. Practical first, with the psychology inside.
 
-Roughly 1,100-1,500 words of body.
+Roughly 650-850 words of body (shortened 2026-11-16). The post carries the story, the belief and
+the short version of the procedure; the download carries the working detail. Every post's job is to
+get the reader to financialhypnosis.com, and the download lives there (see "The download link").
 
 ## 1. The trap (about 150-250 words)
 
@@ -25,17 +27,15 @@ coach).
 Close with the turn: one short standalone line that flips the reader's assumption. "Every
 one of those was a pricing decision. You just made it by not making it."
 
-## 2. The diagnostic (about 200-300 words)
+## 2. The one number (about 80-120 words)
 
-The load-bearing movement. The reader applies something to their own practice right now
-and arrives at the diagnosis themselves.
+The reader calculates one thing about their own practice right now: the number, how to get
+it, and what it means at each level, in two or three lines. Then point to the download once,
+here: "Your full score is in the download: twelve statements, five minutes, a pen." The
+yes/no questions no longer appear in the post; they become the download's scored items.
 
-- One number to calculate, what it means, and what to do at each level.
-- Five to seven yes/no questions, no answers supplied, closed with a threshold: "If you
-  said no to three or more of these, you have your project for the month."
-
-Write both for any practice. A tax example can sit beside a question; the question itself
-must work for a counselor.
+Write it for any practice. A tax example can sit beside it; the number itself must work for
+a counselor.
 
 ## 3. The psychology beat (about 150-250 words)
 
@@ -49,25 +49,24 @@ must work for a counselor.
 - Coaching and education language. No diagnosing, no clinical claims, no promises about
   hypnosis.
 
-## 4. The protocol (about 400-600 words)
+## 4. The protocol, short (about 150-250 words)
 
-Numbered, sequential, literal. A procedure the reader can run this week.
+Name the technique ("the November fee reset," "the script swap"), then the steps as a
+numbered list of one-line headlines: what to do, not how. The step-by-step detail, the
+remaining scripts and the fill-in blanks live in the download.
 
-- The steps make the decision for the reader: a formula sets the number, defaults decide
-  who and when, a script removes the wording decision.
-- Always give exact words: a script, a notice, an email, a line to say when the client
-  asks. Drop out of prose straight into the copy-paste.
-- Always include a commitment step: say the number out loud ten times; put the date on the
-  calendar and tell one person.
-- Name the technique ("the November fee reset," "the script swap").
-- Written out in full. The PDF is the working copy of what the reader just read, never the
-  continuation of it. Anything that renders as a list appears in both places.
+- The steps still make the decision for the reader: a formula sets the number, defaults
+  decide who and when, a script removes the wording decision.
+- **One script in full**, the one the reader will copy and paste (the notice, the email,
+  the line to say when the client asks). Drop out of prose straight into the copy-paste.
+- The commitment step stays in the list: say the number out loud ten times; put the date on
+  the calendar and tell one person.
 
-## 5. The close (about 120-200 words)
+## 5. The close (about 80-150 words)
 
 - Recap the job in one line: "One afternoon, ten returns, three hassle fees, and a script."
 - Repeat the single most important action, verbatim, two or three times, escalating.
-- Mention the download once, plainly.
+- Point to the download a second time, with its link (see "The download link").
 - Make exactly one invitation, tied to the topic:
   - **Behind the Books**, the free monthly Zoom for practitioners and business owners
     (financialhypnosis.com/biz), with this month's topic named if the angle gives it.
@@ -88,10 +87,19 @@ Numbered, sequential, literal. A procedure the reader can run this week.
 - Short paragraphs and white space as rhythm, but prefer paragraphs longer than two
   sentences where the talk still flows.
 
+## The download link
+
+The PDF is not attached on Substack. It is hosted at financialhypnosis.com/d/<name>, which
+serves and counts it, and both mentions link there with the post's tag:
+`https://financialhypnosis.com/d/<name>?src=bizorca-<post-slug>`. Name the file after the
+download's title (`fee-reset-score`). When the post is published, the rendered PDF is copied
+into the website repo's `public/downloads/<name>.pdf` and deployed.
+
 ## The standing risks
 
-- The post degrading into an ad for the download or the invitation. Full trap, diagnostic,
-  psychology beat and protocol in the body.
+- The post becoming an ad for the download. The story, the belief, the one number, the step
+  headlines and one full script stay in the body, so a reader who never downloads still gets
+  something they can use.
 - The post becoming pure psychology. Every post ends with the reader holding a procedure.
 - The download or protocol only working for tax pros. A massage therapist must be able to
   use every line.
@@ -109,8 +117,17 @@ week's unless the post plainly needs it). Rules for every container:
 - **The psychology is inside the download too.** Every container carries the belief or
   behavior pattern the post names, as described per container below. A download that is
   only logistics is wrong.
-- **It is the working copy of the post,** not new material: the post's number, questions,
-  steps, scripts and commitment, formatted to fill in with a pen.
+- **It is the working copy of the procedure, and it has to stand alone** (2026-11-16). The
+  post no longer repeats the steps, so a printed page handed to someone who never read the
+  post must still make sense: the intro carries the belief in one sentence and what the page
+  is for, and each step's why goes in its one-line `note` or `hint`. The content is still the
+  post's: its number, the yes/no questions turned into scored items, the steps in full, the
+  scripts as fill-in versions, and the commitment.
+- **Explanations go only in the slots that already exist**: the intro, item `note`s (checklists
+  and worksheets) and field `hint`s, one short line each. **Test items get no notes**: page 1
+  of a test is full, and a note there pushes items onto page 2 and squeezes the fill-in sheet.
+  No new section types, no paragraphs. Proof every download (`weekly_push.py --proof`) and
+  check it is still two pages with page 1 of a test unchanged.
 - Plain text inside the JSON: no markdown, no emoji.
 - **Two printed pages, hard limit.** That holds about a twelve-item test plus a
   nine-field sheet. Limits per container: a test has its twelve items and at most nine
